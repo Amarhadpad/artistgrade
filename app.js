@@ -16,7 +16,7 @@ if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR);
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.static(__dirname)); // serve frontend files (shop.html, adminpanel/)
+app.use(express.static(__dirname)); // serve frontend files (index.html, adminpanel/)
 app.use('/uploads', express.static(UPLOAD_DIR)); // serve uploaded images
 
 // MongoDB connection
@@ -45,27 +45,27 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
+
 // ---------- FRONTEND ROUTES ----------
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'shop.html')));
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
+app.get('/admin/dashboard', (req, res) => res.sendFile(path.join(__dirname, 'adminpanel', 'dashboard.html')));
+app.get('/admin/orders', (req, res) => res.sendFile(path.join(__dirname, 'adminpanel', 'orders.html')));
 app.get('/admin/products', (req, res) => res.sendFile(path.join(__dirname, 'adminpanel', 'products.html')));
-app.get('/admin/login', (req, res) => res.sendFile(path.join(__dirname, 'adminpanel', 'adminlogin.html'))); // optional
-// Add other static frontend routes as needed
+app.get('/admin/users', (req, res) => res.sendFile(path.join(__dirname, 'adminpanel', 'users.html')));      
+
 
 // ---------- API ROUTES ----------
 // GET all products
 app.get('/api/products', async (req, res) => {
   try {
     const products = await Product.find().sort({ createdAt: -1 });
-    // Prepend server origin to images if needed (images stored as /uploads/...)
-    const host = req.get('host');
-    const proto = req.protocol;
     const mapped = products.map(p => ({
       _id: p._id,
       name: p.name,
       category: p.category,
       price: p.price,
       stock: p.stock,
-      image: p.image // it's already a relative path served by express
+      image: p.image
     }));
     res.json(mapped);
   } catch (err) {
@@ -120,7 +120,6 @@ app.put('/api/products/:id', upload.single('image'), async (req, res) => {
     if (stock !== undefined) product.stock = Number(stock);
 
     if (req.file) {
-      // delete old image file if present
       if (product.image) {
         const oldPath = path.join(__dirname, product.image);
         if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
@@ -142,7 +141,6 @@ app.delete('/api/products/:id', async (req, res) => {
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).json({ message: 'Not found' });
 
-    // remove image file
     if (product.image) {
       const imgPath = path.join(__dirname, product.image);
       if (fs.existsSync(imgPath)) fs.unlinkSync(imgPath);
@@ -155,6 +153,13 @@ app.delete('/api/products/:id', async (req, res) => {
     res.status(500).json({ message: 'Error deleting product' });
   }
 });
+
+
+// ---------- 404 HANDLER (last route) ----------
+app.use((req, res) => {
+  res.status(404).sendFile(path.join(__dirname, 'public', '404.html'));
+});
+
 
 // Start server
 app.listen(PORT, () => console.log(`🚀 Server running: http://localhost:${PORT}`));

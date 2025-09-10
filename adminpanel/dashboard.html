@@ -1,59 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ArtistGrade Admin Panel</title>
-
-  <!-- Bootstrap 5 -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
   <style>
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: #f9f9f9;
-    }
-
-
-    .sidebar {
-      height: 100vh;
-      background-color: #343a40;
-      padding-top: 20px;
-    }
-
-    .sidebar a {
-      color: #adb5bd;
-      text-decoration: none;
-      display: block;
-      padding: 15px 20px;
-    }
-
-    .sidebar a:hover,
-    .sidebar a.active {
-      background-color: #495057;
-      color: white;
-      border-left: 5px solid #6f42c1;
-    }
-
-    .dashboard-header {
-      padding: 20px;
-      background-color: white;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    }
-
-    .card {
-      border: none;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-    }
-
-    .card i {
-      font-size: 1.8rem;
-      color: #6f42c1;
+    body { background: #f9f9f9; font-family: 'Inter', sans-serif; }
+    .sidebar { background: #343a40; min-height: 100vh; padding-top: 20px; }
+    .sidebar a { color: #adb5bd; padding: 12px 20px; display: block; text-decoration: none; }
+    .sidebar a.active, .sidebar a:hover { background: #495057; color: #fff; border-left: 4px solid #6f42c1; }
+    .dashboard-header { background: #fff; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
+    .card { border: none; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    .table-responsive { overflow-x: auto; }
+    @media (max-width: 768px) {
+      .sidebar { position: fixed; left: -250px; top: 0; width: 250px; transition: left 0.3s ease; z-index: 999; }
+      .sidebar.active { left: 0; }
+      .toggle-btn { background: #343a40; color: #fff; padding: 10px; cursor: pointer; }
     }
   </style>
 </head>
@@ -61,66 +26,85 @@
 
 <div class="container-fluid">
   <div class="row">
-    
+
     <!-- Sidebar -->
-    <nav class="col-md-2 d-none d-md-block sidebar">
-      <div class="text-center text-white mb-4 fw-bold fs-4">AdminPanel</div>
-      <a href="/dashboard" class="active"><i class="fas fa-chart-line me-2"></i> Dashboard</a>
-      <a href="/products"><i class="fas fa-box me-2"></i> Products</a>
-      <a href="/orders"><i class="fas fa-shopping-cart me-2"></i> Orders</a>
-      <a href="/users"><i class="fas fa-users me-2"></i> Users</a> 
+    <nav class="col-md-2 sidebar d-none d-md-block">
+      <h4 class="text-white text-center mb-4">AdminPanel</h4>
+      <a href="/admin/dashboard" class="active"><i class="fas fa-chart-line me-2"></i> Dashboard</a>
+      <a href="/admin/products"><i class="fas fa-box me-2"></i> Products</a>
+      <a href="/admin/orders"><i class="fas fa-shopping-cart me-2"></i> Orders</a>
+      <a href="/admin/users"><i class="fas fa-users me-2"></i> Users</a>
     </nav>
+
+    <!-- Mobile Toggle -->
+    <div class="d-md-none p-2">
+      <div class="toggle-btn" onclick="document.querySelector('.sidebar').classList.toggle('active')">
+        <i class="fas fa-bars"></i> Menu
+      </div>
+    </div>
 
     <!-- Main Content -->
     <main class="col-md-10 ms-sm-auto px-md-4">
-      <div class="dashboard-header mt-4 mb-4">
-        <h3 class="fw-semibold">Welcome, Admin</h3>
-        <p class="text-muted">Manage products, orders, and users on ArtistGrade</p>
+      <div class="dashboard-header mt-3">
+        <h3>Welcome, Admin</h3>
+        <p class="text-muted">Manage your store easily</p>
       </div>
 
-      <div class="row g-4">
-        <div class="col-md-4">
-          <div class="card p-4">
-            <div class="d-flex align-items-center">
-              <i class="fas fa-box me-3"></i>
-              <div>
-                <h6>Total Products</h6>
-                <h4 class="mb-0">120</h4>
-              </div>
+      <!-- Stats Cards -->
+      <div class="row g-3">
+        <div class="col-12 col-sm-6 col-lg-4">
+          <div class="card p-3 d-flex align-items-center">
+            <i class="fas fa-box fa-2x text-primary me-3"></i>
+            <div>
+              <h6>Total Products</h6>
+              <h4><%= totalProducts %></h4>
             </div>
           </div>
         </div>
-
-        <div class="col-md-4">
-          <div class="card p-4">
-            <div class="d-flex align-items-center">
-              <i class="fas fa-shopping-cart me-3"></i>
-              <div>
-                <h6>Total Orders</h6>
-                <h4 class="mb-0">245</h4>
-              </div>
+        <div class="col-12 col-sm-6 col-lg-4">
+          <div class="card p-3 d-flex align-items-center">
+            <i class="fas fa-shopping-cart fa-2x text-success me-3"></i>
+            <div>
+              <h6>Total Orders</h6>
+              <h4><%= totalOrders %></h4>
             </div>
           </div>
         </div>
-
-        <div class="col-md-4">
-          <div class="card p-4">
-            <div class="d-flex align-items-center">
-              <i class="fas fa-users me-3"></i>
-              <div>
-                <h6>Registered Users</h6>
-                <h4 class="mb-0">58</h4>
-              </div>
+        <div class="col-12 col-sm-6 col-lg-4">
+          <div class="card p-3 d-flex align-items-center">
+            <i class="fas fa-users fa-2x text-info me-3"></i>
+            <div>
+              <h6>Total Users</h6>
+              <h4><%= totalUsers %></h4>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Add more content as needed -->
-      <div class="mt-5">
-        <h5>Quick Actions</h5>
-        <a href="#" class="btn btn-outline-primary me-3 mt-2"><i class="fas fa-plus"></i> Add Product</a>
-        <a href="#" class="btn btn-outline-success mt-2"><i class="fas fa-file-alt"></i> View Reports</a>
+      <!-- Recent Orders -->
+      <div class="mt-4">
+        <h5>Recent Orders</h5>
+        <div class="card p-3 table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Total</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Example row -->
+              <tr>
+                <td>ORD123</td>
+                <td>John Doe</td>
+                <td>$250</td>
+                <td><span class="badge bg-success">Completed</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
     </main>
@@ -128,5 +112,22 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+async function loadDashboardCounts() {
+  try {
+    const res = await fetch('/api/dashboard-counts');
+    const data = await res.json();
+
+    document.getElementById('totalProducts').textContent = data.totalProducts;
+    document.getElementById('totalOrders').textContent = data.totalOrders;
+    document.getElementById('totalUsers').textContent = data.totalUsers;
+  } catch (err) {
+    console.error('Error loading counts:', err);
+  }
+}
+
+loadDashboardCounts();
+</script>
+
 </body>
 </html>
