@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ArtistGrade - Registration</title>
+
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- FontAwesome (for icons like cart/search) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <!-- External CSS -->
+  <link rel="stylesheet" href="/public/css/style.css">
+  <link rel="stylesheet" href="/public/css/nav.css">
+</head>
+<!-- header.html -->
+<div class="fixed-header">
+  <!-- Top Bar -->
+  <div class="top-bar bg-light py-2 border-bottom">
+    <div class="container">
+      <div class="row align-items-center text-center text-md-start">
+        <div class="col-12 col-md-6 mb-2 mb-md-0">
+          <div class="left-text small">
+            Welcome visitor, you can 
+            <a href="/login">Log in</a> or 
+            <a href="/register">Create an Account</a>
+          </div>
+        </div>
+        <div class="col-12 col-md-6 d-flex justify-content-center justify-content-md-end flex-wrap align-items-center gap-3">
+          <span class="small">Call us: <strong>+91 9921041736</strong></span>
+          <a href="#">Orders</a>
+          <a href="#" class="cart-icon"><i class="fa fa-shopping-cart"></i></a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg main-nav">
+    <div class="container">
+      <a class="navbar-brand" href="/">ArtistGrade</a>
+      <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"><i class="fa fa-bars text-white"></i></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="/shop">Shop</a></li>
+          <li class="nav-item"><a class="nav-link" href="/contactus">About</a></li>
+          <li class="nav-item"><a class="nav-link" href="/contactus">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</div>
+
+
+<body class="reg-page">
+
+  <div class="reg-container">
+    <!-- Left Side Image -->
+    <div class="reg-img-box"></div>
+
+    <!-- Registration Form -->
+    <div class="reg-form-box">
+      <h2 class="reg-title">User Registration</h2>
+    <form id="registerForm" method="POST" action="/api/register">
+      <div class="reg-form-row">
+        <div class="reg-input-box">
+          <label>Full Name</label>
+          <input type="text" name="fullname" placeholder="Enter your name" required>
+        </div>
+        <div class="reg-input-box">
+          <label>Username</label>
+          <input type="text" name="username" placeholder="Enter your username" required>
+        </div>
+      </div>
+
+      <div class="reg-form-row">
+        <div class="reg-input-box">
+          <label>Email</label>
+          <input type="email" name="email" placeholder="Enter your email" required>
+        </div>
+        <div class="reg-input-box">
+          <label>Phone Number</label>
+          <input type="text" name="phone" placeholder="Enter your number" required>
+        </div>
+      </div>
+
+      <div class="reg-form-row">
+        <div class="reg-input-box">
+          <label>Password</label>
+          <input type="password" name="password" placeholder="Enter your password" required>
+        </div>
+        <div class="reg-input-box">
+          <label>Confirm Password</label>
+          <input type="password" name="confirmPassword" placeholder="Confirm your password" required>
+        </div>
+      </div>
+
+      <div class="reg-gender-box">
+        <label><input type="radio" name="gender" value="Male" required> Male</label>
+        <label><input type="radio" name="gender" value="Female"> Female</label>
+        <label><input type="radio" name="gender" value="Prefer not to say"> Prefer not to say</label>
+      </div>
+
+      <button type="submit" class="reg-btn">Register</button>
+    </form>
+
+    </div>
+  </div>
+<script>
+document.getElementById('registerForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const formData = new FormData(e.target);
+  const data = Object.fromEntries(formData.entries());
+
+  const res = await fetch('/api/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+
+  const result = await res.json();
+  alert(result.message);
+});
+</script>
+
+</body>
+</html>

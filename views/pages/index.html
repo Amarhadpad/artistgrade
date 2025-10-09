@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ArtistGrade</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Global Styles -->
+  <link rel="stylesheet" href="/public/css/style.css">
+  <link rel="stylesheet" href="/public/js/s">
+  <link rel="stylesheet" href="/public/css/nav.css">
+<style>
+/* Full-page Lightbox */
+#imageLightbox {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.85);
+  display: none; /* hidden by default */
+  justify-content: center;
+  align-items: center;
+  z-index: 3000;
+  cursor: zoom-out;
+  overflow: auto; /* allows scrolling for very large images */
+}
+
+#imageLightbox img {
+  max-width: 95%;       /* fit almost full width */
+  max-height: 95%;      /* fit almost full height */
+  object-fit: contain;  /* maintain aspect ratio */
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  transition: transform 0.3s ease;
+}
+
+#imageLightbox.show img {
+  transform: scale(1.05); /* subtle zoom-in effect */
+}
+
+#closeLightbox {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  font-size: 2rem;
+  color: #fff;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+</style>
+
+<style>
+  /* Product Cards */
+  .product-card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 15px;
+    transition: all 0.3s ease;
+  }
+  .product-card:hover {
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    transform: translateY(-5px);
+  }
+  .product-card img {
+    border-radius: 12px;
+    height: 220px;
+    object-fit: cover;
+  }
+
+  /* Unique Carousel Buttons */
+  .carousel-control-prev.unique-prev,
+  .carousel-control-next.unique-next {
+    width: 50px;
+    height: 50px;
+    background: #222;
+    color: #fff;
+    border-radius: 50%;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.8;
+    transition: all 0.3s ease;
+    border: none;
+    z-index: 10;
+  }
+
+  .carousel-control-prev.unique-prev:hover,
+  .carousel-control-next.unique-next:hover {
+    background: #444;
+    opacity: 1;
+  }
+
+  .carousel-control-prev.unique-prev i,
+  .carousel-control-next.unique-next i {
+    font-size: 1.5rem;
+  }
+
+  .carousel-control-prev.unique-prev { left: -25px; }
+  .carousel-control-next.unique-next { right: -25px; }
+
+  /* Mobile adjustments */
+  @media (max-width: 767px) {
+    .carousel-control-prev.unique-prev { left: 5px; }
+    .carousel-control-next.unique-next { right: 5px; }
+  }
+</style>
+
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+  <!-- Cart Sidebar Styles (namespaced so it doesn't affect your grids/layout) -->
+  <style>
+    /* Cart Sidebar */
+    .cart-sidebar {
+      position: fixed;
+      top: 0;
+      right: -360px;
+      width: 360px;
+      max-width: 95%;
+      height: 100%;
+      background: #fff;
+      box-shadow: -2px 0 12px rgba(0,0,0,0.2);
+      transition: right 0.28s ease;
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+    }
+    .cart-sidebar.open {
+      right: 0;
+    }
+    .cart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      border-bottom: 1px solid #e9e9e9;
+    }
+    .cart-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px;
+    }
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #f1f1f1;
+    }
+    .cart-item span {
+      display: block;
+      max-width: 70%;
+      word-break: break-word;
+    }
+    .cart-footer {
+      padding: 14px;
+      border-top: 1px solid #e9e9e9;
+    }
+
+    /* Overlay */
+    .cart-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      display: none;
+      z-index: 1900;
+    }
+    .cart-overlay.active {
+      display: block;
+    }
+
+    /* Cart count badge (hidden when zero) */
+    .cart-icon {
+      position: relative;
+      display: inline-block;
+    }
+    .cart-count {
+      display: none;
+      position: absolute;
+      top: -8px;
+      right: -10px;
+      background: #e63946;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 999px;
+      line-height: 1;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .cart-count.show {
+      display: inline-block;
+    }
+
+    /* Small responsive tweak so sidebar doesn't overlap mobile header awkwardly */
+    @media (max-width: 480px){
+      .cart-sidebar { width: 92%; }
+    }
+  </style>
+
+<!-- Full-page Logo Preloader -->
+<div id="logoSplash">
+  <div class="background-animation"></div> <!-- animated background -->
+  <img src="/public/images/car1.jpg" alt="ArtistGrade Logo" class="logo-splash">
+</div>
+
+
+<!-- header.html -->
+<div class="fixed-header">
+  <!-- Top Bar -->
+<div class="top-bar bg-light py-2 border-bottom">
+  <div class="container">
+    <div class="row align-items-center text-center text-md-start">
+      <div class="col-12 col-md-6 mb-2 mb-md-0">
+        <div class="left-text small" id="topBarUser">
+          Welcome visitor, you can 
+          <a href="/login">Log in</a> or 
+          <a href="/register">Create an Account</a>
+        </div>
+      </div>
+      <div class="col-12 col-md-6 d-flex justify-content-center justify-content-md-end flex-wrap align-items-center gap-3">
+        <span class="small">Call us: <strong>+91 9921041736</strong></span>
+        <a href="#">Orders</a>
+        <a href="#" class="cart-icon"><i class="fa fa-shopping-cart"></i></a>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+let isLoggedIn = false; // global login flag
+
+// Function to check current user session
+async function checkUserLogin() {
+  try {
+    const res = await fetch('/api/current_user', {
+      method: 'GET',
+      credentials: 'include'
+    });
+    const user = await res.json();
+
+    const topBar = document.getElementById("topBarUser");
+
+    if (user && user.name) {
+      // ✅ User logged in
+      isLoggedIn = true;
+      topBar.innerHTML = `
+        Welcome, <strong>${user.name}</strong> |
+        <a href="/logout">Logout</a>
+      `;
+      console.log("✅ Logged in as:", user.name);
+    } else {
+      // ❌ Not logged in
+      isLoggedIn = false;
+      topBar.innerHTML = `
+        Welcome visitor, you can 
+        <a href="/login">Log in</a> or 
+        <a href="/register">Create an Account</a>
+      `;
+    }
+  } catch (err) {
+    console.error("Error checking user login:", err);
+  }
+}
+
+// Run check on every page load
+window.addEventListener("DOMContentLoaded", checkUserLogin);
+
+
+// 🛒 Proceed to Payment logic
+const checkoutBtn = document.getElementById("checkoutBtn");
+
+if (checkoutBtn) {
+  checkoutBtn.addEventListener("click", () => {
+    const cart = getCart(); // your existing cart function
+
+    if (!cart || cart.length === 0) {
+      alert("Your cart is empty!");
+      return;
+    }
+
+    if (!isLoggedIn) {
+      alert("Please log in to proceed to payment.");
+      window.location.href = `/login?redirect=/checkout`;
+    } else {
+      console.log("Proceeding to payment...");
+      window.location.href = "/checkout";
+    }
+  });
+}
+</script>
+
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg main-nav">
+    <div class="container">
+      <a class="navbar-brand" href="/">ArtistGrade</a>
+      <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"><i class="fa fa-bars text-white"></i></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link active" href="/">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="/shop">Shop</a></li>
+          <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
+          <li class="nav-item"><a class="nav-link" href="/contactus">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</div>
+
+<body class="index-page">
+
+ <!-- Hero Section -->
+<section class="hero">
+  <div class="hero-content">
+    <h1>Elevate Your Artistry</h1>
+    <p>Experience the future of premium, hand-crafted art essentials designed exclusively for creators like you.</p>
+    <a href="/shop" class="btn-explore">Explore Collection</a>
+  </div>
+</section>
+
+ <!-- Best Sellers / Top Brands -->
+<section class="best-sellers py-5">
+  <div class="container position-relative">
+    <h2 class="section-title text-center mb-4">BEST SELLERS</h2>
+
+<div id="bestSellersCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-wrap="true">
+  <div class="carousel-inner" id="bestSellersInner">
+    <!-- Dynamic slides will be injected here -->
+  </div>
+      <!-- Carousel Controls -->
+      <button class="carousel-control-prev unique-prev" type="button" data-bs-target="#bestSellersCarousel" data-bs-slide="prev">
+        <i class="bi bi-chevron-left"></i>
+      </button>
+      <button class="carousel-control-next unique-next" type="button" data-bs-target="#bestSellersCarousel" data-bs-slide="next">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+</div>
+</section>
+  
+<!-- Features Section -->
+<section class="features-section py-5">
+  <div class="container text-center">
+    <h2 class="section-title mb-3">Why Choose ArtistGrade</h2>
+    <p class="section-subtitle mb-5">
+      Discover the unique features that make ArtistGrade the perfect partner for your art & creativity.
+    </p>
+
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="feature-card">
+          <i class="fa-solid fa-palette feature-icon"></i>
+          <h5>Premium Handcrafted Products</h5>
+          <p>Every item is carefully crafted by skilled artisans for unmatched quality.</p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="feature-card">
+          <i class="fa-solid fa-pen-ruler feature-icon"></i>
+          <h5>Custom Requests Made Easy</h5>
+          <p>Submit your ideas and get tailor-made art supplies & accessories.</p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="feature-card">
+          <i class="fa-solid fa-people-group feature-icon"></i>
+          <h5>Artist-Focused Platform</h5>
+          <p>Built exclusively for artists, hobbyists & creators to source the best tools.</p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="feature-card">
+          <i class="fa-solid fa-recycle feature-icon"></i>
+          <h5>Sustainable & Ethical</h5>
+          <p>Eco-friendly materials & packaging that respect our planet.</p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="feature-card">
+          <i class="fa-solid fa-truck-fast feature-icon"></i>
+          <h5>Worldwide Delivery</h5>
+          <p>Fast, secure shipping for artists and studios across the globe.</p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="feature-card">
+          <i class="fa-solid fa-headset feature-icon"></i>
+          <h5>Dedicated Support</h5>
+          <p>Friendly assistance at every step — from inquiry to final product.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+ <footer class="artist-footer">
+  <div class="footer-container">
+    <!-- Brand Section -->
+    <div class="footer-section footer-brand">
+      <h2 class="footer-logo">🎨 ArtistGrade</h2>
+      <p class="footer-tagline">Your one-stop store for premium art supplies & creative tools.</p>
+
+      <div class="footer-social">
+        <a href="#"><i class="fab fa-facebook-f"></i></a>
+        <a href="#"><i class="fab fa-instagram"></i></a>
+        <a href="#"><i class="fab fa-twitter"></i></a>
+        <a href="#"><i class="fab fa-youtube"></i></a>
+      </div>
+
+   <a href="https://wa.me/919137534732?text=Hello%20ArtistGrade%2C%20I%20saw%20your%20website%20and%20want%20to%20know%20more%20about%20your%20products."
+   target="_blank" 
+   class="whatsapp-btn">
+    <i class="fab fa-whatsapp"></i> Chat on WhatsApp
+  </a>
+
+    </div>
+
+    <!-- Quick Links -->
+    <div class="footer-section">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/shop">Shop</a></li>
+        <li><a href="/about">About Us</a></li>
+        <li><a href="/contactus">Contact Us</a></li>
+        <li><a href="/admin">Admin</a></li>
+      </ul>
+    </div>
+
+    <!-- Support Links -->
+    <div class="footer-section">
+      <h4>Support</h4>
+      <ul>
+        <li><a href="#">Customer Support</a></li>
+        <li><a href="#">Returns & Refunds</a></li>
+        <li><a href="/privacy">Privacy Policy</a></li>
+        <li><a href="#">Terms & Conditions</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p>© 2025 ArtistGrade Inc. All rights reserved.</p>
+  </div>
+</footer>
+<!-- Cart Sidebar -->
+<div id="cartSidebar" class="cart-sidebar" aria-hidden="true">
+  <div class="cart-header">
+    <h5 class="mb-0">Your Cart</h5>
+    <button class="btn-close" id="closeCart" aria-label="Close cart"></button>
+  </div>
+
+  <div class="cart-body" id="cartItems">
+    <p class="text-muted">Your cart is empty</p>
+  </div>
+
+  <div class="cart-footer">
+    <button id="checkoutBtn" class="btn btn-dark w-100">Proceed to Payment</button>
+  </div>
+</div>
+
+<!-- Overlay -->
+<div id="cartOverlay" class="cart-overlay" tabindex="-1"></div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Cart behavior script (keeps footer & other content untouched) -->
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    async function updateTopBar() {
+      try {
+        const res = await fetch('/api/current_user');
+        const user = await res.json();
+
+        const topBar = document.getElementById('topBarUser');
+        if (user) {
+          topBar.innerHTML = `Welcome, <strong>${user.name}</strong> | <a href="/logout">Log out</a>`;
+        } else {
+          topBar.innerHTML = `Welcome visitor, you can 
+            <a href="/login">Log in</a> or 
+            <a href="/register">Create an Account</a>`;
+        }
+      } catch (err) {
+        console.error('Error fetching user:', err);
+      }
+    }
+
+    // Call it on page load
+    updateTopBar();
+</script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const cartIcon = document.querySelector(".cart-icon");
+    const sidebar = document.getElementById("cartSidebar");
+    const overlay = document.getElementById("cartOverlay");
+    const closeCart = document.getElementById("closeCart");
+    const checkoutBtn = document.getElementById("checkoutBtn");
+    const cartItemsContainer = document.getElementById("cartItems");
+
+    // Create cart badge dynamically
+    const cartCountBadge = document.createElement("span");
+    cartCountBadge.className = "cart-count";
+    cartIcon.appendChild(cartCountBadge);
+
+    // ---------- CART STORAGE ----------
+    function getCart() {
+      return JSON.parse(localStorage.getItem("cart") || "[]");
+    }
+    function saveCart(cart) {
+      localStorage.setItem("cart", JSON.stringify(cart));
+    }
+
+    // ---------- UPDATE CART UI ----------
+    function updateCartUI() {
+      const cart = getCart();
+      if (cart.length === 0) {
+        cartItemsContainer.innerHTML = '<p class="text-muted">Your cart is empty</p>';
+        cartCountBadge.textContent = "";
+        cartCountBadge.classList.remove("show");
+        return;
+      }
+
+      cartItemsContainer.innerHTML = "";
+      cart.forEach((item, index) => {
+        const div = document.createElement("div");
+        div.className = "cart-item";
+        div.innerHTML = `
+          <span>${item.name} - ${item.price}</span>
+          <div>
+            <button class="btn btn-sm btn-outline-danger remove-item" data-index="${index}">Remove</button>
+          </div>`;
+        cartItemsContainer.appendChild(div);
+      });
+
+      // Update badge
+      cartCountBadge.textContent = cart.length;
+      cartCountBadge.classList.add("show");
+
+      // Attach remove listeners
+      cartItemsContainer.querySelectorAll(".remove-item").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const cart = getCart();
+          cart.splice(parseInt(btn.dataset.index), 1);
+          saveCart(cart);
+          updateCartUI();
+        });
+      });
+    }
+
+    // ---------- ADD TO CART ----------
+    window.addToCart = (productId) => {
+      const card = document.querySelector(`[onclick="addToCart('${productId}')"]`).closest(".product-card");
+      const name = card.querySelector("h3").textContent.trim();
+      const price = card.querySelector("p").textContent.trim();
+      const cart = getCart();
+
+      cart.push({ name, price });
+      saveCart(cart);
+      updateCartUI();
+
+      sidebar.classList.add("open");
+      overlay.classList.add("active");
+    };
+
+    // ---------- SIDEBAR CONTROLS ----------
+    cartIcon.addEventListener("click", (e) => {
+      e.preventDefault();
+      sidebar.classList.add("open");
+      overlay.classList.add("active");
+    });
+    closeCart.addEventListener("click", () => {
+      sidebar.classList.remove("open");
+      overlay.classList.remove("active");
+    });
+    overlay.addEventListener("click", () => {
+      sidebar.classList.remove("open");
+      overlay.classList.remove("active");
+    });
+
+    checkoutBtn.addEventListener("click", async () => {
+  const cart = getCart();
+  if (cart.length === 0) {
+    alert("Your cart is empty. Please add items before proceeding to payment.");
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/current_user', {
+      method: 'GET',
+      credentials: 'include'
+    });
+    const user = await res.json();
+
+    if (!user || !user.name) {
+      alert("Please log in to proceed to payment.");
+      window.location.href = `/login?redirect=/checkout`;
+    } else {
+      console.log("✅ Logged in user:", user.name);
+      window.location.href = "/checkout"; 
+    }
+  } catch (err) {
+    console.error("Error checking user login:", err);
+    window.location.href = `/login?redirect=/checkout`;
+  }
+});
+
+    // ---------- INITIALIZE ----------
+    updateCartUI();
+  });
+</script>
+
+<script>
+  // ---------- LOAD BEST SELLERS ----------
+  const BEST_SELLERS_API = "/api/products?bestSellers=true";
+
+  async function loadBestSellers() {
+    try {
+      const res = await fetch(BEST_SELLERS_API);
+      if (!res.ok) throw new Error("Failed to fetch best sellers");
+      const products = await res.json();
+
+      const inner = document.getElementById("bestSellersInner");
+      inner.innerHTML = "";
+
+      for (let i = 0; i < products.length; i += 4) {
+        const slideDiv = document.createElement("div");
+        slideDiv.className = `carousel-item ${i === 0 ? "active" : ""}`;
+
+        let rowHTML = '<div class="row g-3 justify-content-center">';
+        products.slice(i, i + 4).forEach((p, index) => {
+          rowHTML += `
+            <div class="col-12 col-md-6 col-lg-3 ${index > 0 ? "d-none d-md-block" : ""} ${index > 1 ? "d-none d-lg-block" : ""}">
+              <div class="product-card text-center">
+                <img src="${p.image}" class="d-block w-100" alt="${p.name}">
+                <h3>${p.name}</h3>
+                <p>₹${p.price}</p>
+                <button class="btn btn-dark" onclick="addToCart('${p._id}')">Add to Cart</button>
+              </div>
+            </div>`;
+        });
+        rowHTML += "</div>";
+        slideDiv.innerHTML = rowHTML;
+        inner.appendChild(slideDiv);
+      }
+    } catch (err) {
+      console.error(err);
+      document.getElementById("bestSellersInner").innerHTML =
+        '<p class="text-center">Failed to load products.</p>';
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", loadBestSellers);
+</script>
+<script>
+  const splash = document.getElementById("logoSplash");
+  const logo = document.querySelector(".logo-splash");
+
+  logo.addEventListener("animationend", () => {
+    document.body.classList.add("loaded"); // triggers fade out
+    setTimeout(() => {
+      splash.style.display = "none";
+    }, 500);
+  });
+</script>
+
+<div id="imageLightbox">
+  <span id="closeLightbox">&times;</span>
+  <img id="lightboxImg" src="">
+</div>
+<script>
+  const BEST_SELLERS_API = "/api/products?bestSellers=true";
+  const lightbox = document.getElementById("imageLightbox");
+  const lightboxImg = document.getElementById("lightboxImg");
+
+  // ---------- LIGHTBOX ----------
+  function openLightbox(src) {
+    lightboxImg.src = src;
+    lightbox.style.display = "flex";
+    lightbox.classList.add("show");
+  }
+
+  function closeLightbox() {
+    lightbox.style.display = "none";
+    lightbox.classList.remove("show");
+  }
+
+  lightbox.addEventListener("click", (e) => {
+    if (e.target === lightbox) closeLightbox();
+  });
+
+  document.getElementById("closeLightbox").addEventListener("click", closeLightbox);
+
+  // ---------- LOAD BEST SELLERS ----------
+  async function loadBestSellers() {
+    try {
+      const res = await fetch(BEST_SELLERS_API);
+      if (!res.ok) throw new Error("Failed to fetch best sellers");
+      const products = await res.json();
+
+      const inner = document.getElementById("bestSellersInner");
+      inner.innerHTML = "";
+
+      for (let i = 0; i < products.length; i += 4) {
+        const slideDiv = document.createElement("div");
+        slideDiv.className = `carousel-item ${i === 0 ? "active" : ""}`;
+
+        let rowHTML = '<div class="row g-3 justify-content-center">';
+        products.slice(i, i + 4).forEach(p => {
+          rowHTML += `
+            <div class="col-12 col-md-6 col-lg-3">
+              <div class="product-card text-center">
+                <img src="${p.image}" class="d-block w-100 carousel-img" alt="${p.name}" style="cursor:pointer;">
+                <h3>${p.name}</h3>
+                <p>₹${p.price}</p>
+                <button class="btn btn-dark" onclick="addToCart('${p._id}')">Add to Cart</button>
+              </div>
+            </div>`;
+        });
+        rowHTML += "</div>";
+        slideDiv.innerHTML = rowHTML;
+        inner.appendChild(slideDiv);
+      }
+
+      // ---------- ATTACH LIGHTBOX CLICK ----------
+      inner.querySelectorAll("img.carousel-img").forEach(img => {
+        img.addEventListener("click", () => openLightbox(img.src));
+      });
+
+    } catch (err) {
+      console.error(err);
+      document.getElementById("bestSellersInner").innerHTML =
+        '<p class="text-center">Failed to load products.</p>';
+    }
+  }
+
+  // ---------- DOM READY ----------
+  document.addEventListener("DOMContentLoaded", loadBestSellers);
+</script>
+
+</body>
+</html>

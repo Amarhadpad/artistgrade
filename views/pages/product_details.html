@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ArtistGrade | Product Details</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f9f9f9;
+    }
+    header {
+      background: #222;
+      color: #fff;
+      padding: 15px;
+      text-align: center;
+      font-size: 22px;
+      font-weight: bold;
+    }
+    .container {
+      display: flex;
+      gap: 40px;
+      padding: 40px;
+      max-width: 1200px;
+      margin: auto;
+      background: #fff;
+      border-radius: 10px;
+    }
+    .gallery {
+      flex: 1;
+    }
+    .gallery img {
+      width: 100%;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+    .thumbnails {
+      display: flex;
+      gap: 10px;
+    }
+    .thumbnails img {
+      width: 80px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      border-radius: 5px;
+    }
+    .thumbnails img:hover {
+      border: 2px solid #007bff;
+    }
+    .details {
+      flex: 1;
+    }
+    .details h2 {
+      margin: 0;
+      font-size: 26px;
+    }
+    .price {
+      font-size: 22px;
+      color: #007bff;
+      margin: 10px 0;
+    }
+    .old-price {
+      text-decoration: line-through;
+      color: #888;
+      margin-left: 10px;
+    }
+    .options {
+      margin: 20px 0;
+    }
+    .options label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    .options select {
+      padding: 8px;
+      width: 200px;
+      margin-bottom: 15px;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .tabs {
+      margin-top: 40px;
+    }
+    .tab-buttons {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+    .tab-buttons button {
+      background: #eee;
+      color: #333;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    .tab-buttons button.active {
+      background: #007bff;
+      color: white;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <header>🎨 ArtistGrade - Product Details</header>
+
+  <div class="container">
+    <div class="gallery">
+      <img id="mainImage" src="" alt="Product Image">
+      <div class="thumbnails" id="thumbnails"></div>
+    </div>
+    <div class="details">
+      <h2 id="productTitle">Loading...</h2>
+      <div class="price">
+        <span id="productPrice"></span>
+        <span class="old-price" id="productOldPrice"></span>
+      </div>
+      <p id="productDesc"></p>
+      <div class="options">
+        <label for="color">Choose Color:</label>
+        <select id="color"></select>
+        <label for="size">Choose Size:</label>
+        <select id="size"></select>
+      </div>
+      <button>Add to Cart 🛒</button>
+
+      <div class="tabs">
+        <div class="tab-buttons">
+          <button class="tab-btn active" data-tab="specs">Specifications</button>
+          <button class="tab-btn" data-tab="reviews">Reviews</button>
+          <button class="tab-btn" data-tab="shipping">Shipping Info</button>
+          <button class="tab-btn" data-tab="seller">Seller Profile</button>
+        </div>
+        <div class="tab-content active" id="specs">
+          <p>Dimensions: 20x30 inches<br>Material: Canvas<br>Weight: 500g</p>
+        </div>
+        <div class="tab-content" id="reviews">
+          <p>⭐️⭐️⭐️⭐️☆ - Beautiful artwork! <br>⭐️⭐️⭐️⭐️⭐️ - Loved the details!</p>
+        </div>
+        <div class="tab-content" id="shipping">
+          <p>Ships in 5-7 business days. Free worldwide delivery on orders above $50.</p>
+        </div>
+        <div class="tab-content" id="seller">
+          <p>Artist: John Doe<br>Experience: 10+ years<br>Specialty: Modern Abstract Art</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Sample Product Database
+    const products = [
+      {
+        id: "1",
+        title: "Blue Abstract Painting",
+        desc: "A modern abstract painting with vibrant blue tones.",
+        price: "$120",
+        oldPrice: "$150",
+        images: [
+          "https://picsum.photos/600/400?random=1",
+          "https://picsum.photos/600/400?random=2",
+          "https://picsum.photos/600/400?random=3"
+        ],
+        colors: ["Blue", "Green", "Red"],
+        sizes: ["Small", "Medium", "Large"]
+      },
+      {
+        id: "2",
+        title: "Sunset Over Mountains",
+        desc: "Hand-painted canvas of a breathtaking mountain sunset.",
+        price: "$200",
+        oldPrice: "$250",
+        images: [
+          "https://picsum.photos/600/400?random=4",
+          "https://picsum.photos/600/400?random=5",
+          "https://picsum.photos/600/400?random=6"
+        ],
+        colors: ["Orange", "Purple", "Yellow"],
+        sizes: ["Canvas", "Poster", "Framed"]
+      }
+    ];
+
+    // Get Product ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get("id") || "1"; // default to id=1
+
+    // Find Product
+    const product = products.find(p => p.id === productId);
+
+    if (product) {
+      document.getElementById("productTitle").innerText = product.title;
+      document.getElementById("productDesc").innerText = product.desc;
+      document.getElementById("productPrice").innerText = product.price;
+      document.getElementById("productOldPrice").innerText = product.oldPrice;
+
+      // Main image
+      document.getElementById("mainImage").src = product.images[0];
+
+      // Thumbnails
+      const thumbContainer = document.getElementById("thumbnails");
+      product.images.forEach(img => {
+        const t = document.createElement("img");
+        t.src = img;
+        t.onclick = () => (document.getElementById("mainImage").src = img);
+        thumbContainer.appendChild(t);
+      });
+
+      // Colors
+      const colorSelect = document.getElementById("color");
+      product.colors.forEach(c => {
+        const opt = document.createElement("option");
+        opt.value = c;
+        opt.textContent = c;
+        colorSelect.appendChild(opt);
+      });
+
+      // Sizes
+      const sizeSelect = document.getElementById("size");
+      product.sizes.forEach(s => {
+        const opt = document.createElement("option");
+        opt.value = s;
+        opt.textContent = s;
+        sizeSelect.appendChild(opt);
+      });
+    }
+
+    // Tabs logic
+    const tabButtons = document.querySelectorAll(".tab-btn");
+    const tabContents = document.querySelectorAll(".tab-content");
+
+    tabButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        tabButtons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+
+        tabContents.forEach(c => c.classList.remove("active"));
+        document.getElementById(btn.dataset.tab).classList.add("active");
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contact – ArtistGrade</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link rel="stylesheet" href="/public/css/nav.css">
+  <style>
+    body {
+      margin-top: 110px;
+      font-family: 'Inter', sans-serif;
+      background-color: #fefcfb;
+      color: #222;
+    }
+
+    .contact-header {
+      background: linear-gradient(120deg, #6f42c1, #9c5ce0);
+      color: #fff;
+      padding: 60px 0;
+      text-align: center;
+    }
+
+    .contact-header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 3rem;
+      margin-bottom: 10px;
+    }
+
+    .form-control:focus {
+      border-color: #6f42c1;
+      box-shadow: 0 0 0 0.2rem rgba(111, 66, 193, 0.25);
+    }
+
+    .btn-send {
+      background-color: #6f42c1;
+      color: white;
+      border-radius: 30px;
+    }
+
+    .btn-send:hover {
+      background-color: #56339e;
+    }
+
+    iframe {
+      border: none;
+      width: 100%;
+      height: 350px;
+      border-radius: 10px;
+    }
+        .navbar-brand {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+
+<!-- header.html -->
+<div class="fixed-header">
+  <!-- Top Bar -->
+  <div class="top-bar bg-light py-2 border-bottom">
+    <div class="container">
+      <div class="row align-items-center text-center text-md-start">
+        <div class="col-12 col-md-6 mb-2 mb-md-0">
+          <div class="left-text small">
+            Welcome visitor, you can 
+            <a href="/login">Log in</a> or 
+            <a href="/register">Create an Account</a>
+          </div>
+        </div>
+        <div class="col-12 col-md-6 d-flex justify-content-center justify-content-md-end flex-wrap align-items-center gap-3">
+          <span class="small">Call us: <strong>(123) 456-7890</strong></span>
+          <a href="#">Orders</a>
+          <a href="#" class="cart-icon"><i class="fa fa-shopping-cart"></i></a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg main-nav">
+    <div class="container">
+      <a class="navbar-brand" href="/">ArtistGrade</a>
+      <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"><i class="fa fa-bars text-white"></i></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link active" href="/">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="/shop">Shop</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Features</a></li>
+          <li class="nav-item"><a class="nav-link" href="/contactus">Contact</a></li>
+          <li class="nav-item"><a class="nav-link" href="#"><i class="fa fa-search"></i></a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</div>
+
+  <!-- Header -->
+  <section class="contact-header">
+    <div class="container">
+      <h1>Let's Connect</h1>
+      <p class="lead">We'd love to hear from you. Send your thoughts, queries, or just say hello!</p>
+    </div>
+  </section>
+
+  <!-- Contact Form -->
+  <section class="py-5">
+    <div class="container">
+      <div class="row g-5">
+        <div class="col-md-6">
+          <h2 class="mb-4">Send us a message</h2>
+          <form>
+            <div class="mb-3">
+              <label class="form-label">Your Name</label>
+              <input type="text" class="form-control" placeholder="Enter your name">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Email address</label>
+              <input type="email" class="form-control" placeholder="name@example.com">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Message</label>
+              <textarea class="form-control" rows="5" placeholder="Type your message..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-send px-4 py-2 mt-2">Send Message</button>
+          </form>
+        </div>
+
+        <div class="col-md-6">
+          <h2 class="mb-4">Visit our Studio</h2>
+          <iframe src="https://www.google.com/maps/embed?pb=!1m18..." loading="lazy" allowfullscreen></iframe>
+          <p class="mt-3"><i class="fas fa-map-marker-alt me-2"></i>Vasai, Maharashtra, India</p>
+          <p><i class="fas fa-envelope me-2"></i>support@artistgrade.com</p>
+          <p><i class="fas fa-phone me-2"></i>+91-9137534732</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="text-center py-4 bg-dark text-light mt-5">
+    <p class="mb-1">© 2025 ArtistGrade</p>
+    <small>Crafted with 💌 by Amar Hadpad</small>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

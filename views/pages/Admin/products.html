@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Products - Artistgrade Admin</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../../public/css/adminstyles.css">
+  
+  <style>
+    .product-img{ width:50px; height:50px; object-fit:cover; border-radius:5px; }
+    .cursor-pointer{ cursor:pointer; }
+  </style>
+</head>
+<body>
+  <!-- Mobile Top Nav -->
+  <nav class="navbar navbar-light topnav d-md-none">
+    <div class="container-fluid">
+      <a class="navbar-brand brand" href="dashboard.html">AdminPanel</a>
+      <div class="d-flex gap-2">
+        <a class="btn btn-sm btn-outline-secondary" href="products">Products</a>
+        <a class="btn btn-sm btn-outline-secondary" href="orders">Orders</a>
+        <a class="btn btn-sm btn-outline-secondary" href="users">Users</a>
+        <a class="btn btn-sm btn-outline-danger" href="#">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar -->
+      <nav class="col-md-2 d-none d-md-block sidebar">
+        <div class="text-center text-white mb-4 fw-bold fs-4">AdminPanel</div>
+        <a href="dashboard"><i class="fas fa-chart-line me-2"></i> Dashboard</a>
+        <a href="products" class="active"><i class="fas fa-box me-2"></i> Products</a>
+        <a href="orders"><i class="fas fa-shopping-cart me-2"></i> Orders</a>
+        <a href="users"><i class="fas fa-users me-2"></i> Users</a>
+        <a href="#"><i class="fas fa-sign-out-alt me-2"></i> Logout</a>
+      </nav>
+
+      <!-- Main Content -->
+      <main class="col-md-10 ms-sm-auto px-md-4">
+      <div class="dashboard-header mt-4 mb-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+          
+          <!-- Title -->
+          <h3 class="fw-semibold mb-0">Products</h3>
+
+          <!-- Search + Add Button -->
+          <div class="d-flex flex-column flex-sm-row gap-2 w-100 w-md-auto">
+            <input id="searchInput" 
+                  class="form-control flex-fill" 
+                  placeholder="Search products...">
+            <button class="btn btn-primary w-100 w-sm-auto" 
+                    data-bs-toggle="modal" 
+                    data-bs-target="#addProductModal">
+              <i class="fas fa-plus me-1"></i> Add New Product
+            </button>
+          </div>
+
+        </div>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover bg-white">
+          <thead>
+            <tr>
+              <th>Image</th>
+              <th>Name</th>
+              <th>Category</th>
+              <th>Price</th>
+              <th>Stock</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="productList"></tbody>
+        </table>
+      </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Modal for Add/Edit Product -->
+  <div class="modal fade" id="addProductModal" tabindex="-1">
+    <div class="modal-dialog">
+      <form id="productForm" class="modal-content" enctype="multipart/form-data">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalTitle">Add Product</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body">
+          <input type="hidden" name="id" id="productId">
+          <div class="mb-3">
+            <label class="form-label">Product Name</label>
+            <input type="text" class="form-control" name="name" id="productName" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Category</label>
+            <input type="text" class="form-control" name="category" id="productCategory" required>
+          </div>
+          <div class="mb-3 row">
+            <div class="col">
+              <label class="form-label">Price</label>
+              <input type="number" class="form-control" name="price" id="productPrice" required>
+            </div>
+            <div class="col">
+              <label class="form-label">Stock</label>
+              <input type="number" class="form-control" name="stock" id="productStock" required>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Image (choose to replace or leave empty on edit)</label>
+            <input type="file" class="form-control" name="image" id="productImage" accept="image/*">
+            <img id="imagePreview" class="mt-2" style="max-width:150px; display:none;">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" id="saveBtn" class="btn btn-success">Save</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <script>
+    const API = '/api/products';
+
+    // Cloudinary config
+    const cloudName = "dbbzwinzl";
+    const uploadPreset = "unsigned_preset"; // replace with your actual preset
+
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchProducts();
+
+      const form = document.getElementById('productForm');
+      const preview = document.getElementById('imagePreview');
+      const fileInput = document.getElementById('productImage');
+      const modalEl = document.getElementById('addProductModal');
+      const bootstrapModal = new bootstrap.Modal(modalEl);
+
+      // Image preview on file select
+      fileInput.addEventListener('change', (e) => {
+        const f = e.target.files[0];
+        if (f) {
+          const reader = new FileReader();
+          reader.onload = ev => {
+            preview.src = ev.target.result;
+            preview.style.display = 'block';
+          };
+          reader.readAsDataURL(f);
+        } else {
+          preview.style.display = 'none';
+          preview.src = '';
+        }
+      });
+
+      // Reset modal for Add
+      modalEl.addEventListener('show.bs.modal', () => {
+        if (!document.getElementById('productId').value) {
+          document.getElementById('modalTitle').textContent = 'Add Product';
+          preview.style.display = 'none';
+          form.reset();
+        }
+      });
+
+      // Submit form -> add or update
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('productId').value;
+        const formData = new FormData(form);
+        const file = fileInput.files[0];
+
+        // Upload image to Cloudinary if a file is selected
+        if (file) {
+          const uploadData = new FormData();
+          uploadData.append("file", file);
+          uploadData.append("upload_preset", uploadPreset);
+
+          try {
+            document.getElementById('saveBtn').disabled = true;
+            document.getElementById('saveBtn').textContent = "Uploading...";
+            const uploadRes = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+              method: "POST",
+              body: uploadData
+            });
+            const cloudData = await uploadRes.json();
+            formData.append("image", cloudData.secure_url);
+          } catch (err) {
+            alert("Image upload failed.");
+            console.error(err);
+            document.getElementById('saveBtn').disabled = false;
+            document.getElementById('saveBtn').textContent = "Save";
+            return;
+          }
+        }
+
+        // Send product data to backend
+        try {
+          const url = id ? `${API}/${id}` : API;
+          const method = id ? 'PUT' : 'POST';
+          const res = await fetch(url, { method, body: formData });
+          if (!res.ok) throw new Error('Network response was not ok');
+          await fetchProducts();
+          bootstrapModal.hide();
+          form.reset();
+          document.getElementById('productId').value = '';
+          preview.style.display = 'none';
+        } catch (err) {
+          alert('Error saving product');
+          console.error(err);
+        } finally {
+          document.getElementById('saveBtn').disabled = false;
+          document.getElementById('saveBtn').textContent = "Save";
+        }
+      });
+
+      // Search products
+      document.getElementById('searchInput').addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase();
+        document.querySelectorAll('#productList tr').forEach(row => {
+          row.style.display = row.innerText.toLowerCase().includes(term) ? '' : 'none';
+        });
+      });
+    });
+
+    // Fetch products and render table
+    async function fetchProducts() {
+      try {
+        const res = await fetch(API);
+        const products = await res.json();
+        const list = document.getElementById('productList');
+        list.innerHTML = '';
+
+        products.forEach(p => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td><img src="${p.image}" class="product-img"></td>
+            <td>${escapeHtml(p.name)}</td>
+            <td>${escapeHtml(p.category)}</td>
+            <td>₹${p.price}</td>
+            <td>${p.stock}</td>
+            <td>
+              <button class="btn btn-sm btn-warning me-1" onclick="startEdit('${p._id}')"><i class="fas fa-edit"></i></button>
+              <button class="btn btn-sm btn-danger" onclick="deleteProduct('${p._id}')"><i class="fas fa-trash"></i></button>
+            </td>
+          `;
+          list.appendChild(tr);
+        });
+      } catch (err) {
+        console.error('Error fetching products:', err);
+        alert('Failed to fetch products');
+      }
+    }
+
+    // Edit product
+    async function startEdit(id) {
+      try {
+        const res = await fetch(`${API}/${id}`);
+        if (!res.ok) throw new Error('Not found');
+        const p = await res.json();
+        document.getElementById('productId').value = p._id;
+        document.getElementById('productName').value = p.name;
+        document.getElementById('productCategory').value = p.category;
+        document.getElementById('productPrice').value = p.price;
+        document.getElementById('productStock').value = p.stock;
+        document.getElementById('imagePreview').src = p.image;
+        document.getElementById('imagePreview').style.display = 'block';
+        new bootstrap.Modal(document.getElementById('addProductModal')).show();
+      } catch (err) {
+        alert('Unable to fetch product');
+        console.error(err);
+      }
+    }
+
+    // Delete product
+    async function deleteProduct(id) {
+      if (!confirm('Delete this product?')) return;
+      try {
+        const res = await fetch(`${API}/${id}`, { method: 'DELETE' });
+        if (!res.ok) throw new Error('Delete failed');
+        await fetchProducts();
+      } catch (err) {
+        alert('Error deleting product');
+        console.error(err);
+      }
+    }
+
+    // Escape HTML for safe display
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>"'`=\/]/g, function (s) {
+        return ({
+          '&':'&amp;',
+          '<':'&lt;',
+          '>':'&gt;',
+          '"':'&quot;',
+          "'":'&#39;',
+          '/':'&#x2F;',
+          '`':'&#x60;',
+          '=':'&#x3D;'
+        })[s];
+      });
+    }
+  </script>
+</body>
+</html>

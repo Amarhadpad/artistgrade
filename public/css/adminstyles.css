@@ -1,0 +1,240 @@
+/* ------------------------
+   Global Styles
+-------------------------*/
+body {
+  font-family: 'Inter', sans-serif;
+  background: #f4f6f9;
+  color: #2c3e50;
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+h3, h5 {
+  font-weight: 600;
+  color: #1f2d3d;
+}
+
+/* Smooth card hover animation */
+.card {
+  border-radius: 16px;
+  border: none;
+  background: #fff;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+}
+
+/* ------------------------
+   Sidebar
+-------------------------*/
+.sidebar {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #030406 0%, #02050e 100%);
+  padding-top: 20px;
+  box-shadow: 2px 0 12px rgba(0,0,0,0.1);
+}
+
+.sidebar div {
+  letter-spacing: 0.5px;
+}
+
+.sidebar a {
+  display: block;
+  padding: 14px 22px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin: 4px 12px;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+.sidebar a.active,
+.sidebar a:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+/* ------------------------
+   Top Navbar (Mobile)
+-------------------------*/
+.topnav {
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+.topnav .brand {
+  font-weight: 600;
+  font-size: 1.3rem;
+  color: #0d6efd;
+}
+
+/* ------------------------
+   Dashboard Header
+-------------------------*/
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.dashboard-header h3 {
+  font-size: 1.7rem;
+  background: linear-gradient(90deg, #0d6efd, #1b4fd4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.dashboard-header p {
+  font-size: 0.95rem;
+  color: #6b7280;
+}
+
+/* ------------------------
+   Tables
+-------------------------*/
+.table {
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+}
+
+.table thead {
+  background: linear-gradient(90deg, #0d6efd, #1b4fd4);
+  color: #fff;
+}
+
+.table td,
+.table th {
+  padding: 14px;
+  font-size: 0.95rem;
+  vertical-align: middle;
+}
+
+.table-hover tbody tr:hover {
+  background-color: #f0f4ff;
+  transition: 0.2s ease-in-out;
+}
+
+/* ------------------------
+   Status Badges
+-------------------------*/
+.badge-active {
+  background: linear-gradient(90deg, #28a745, #20c997);
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+.badge-inactive {
+  background: linear-gradient(90deg, #dc3545, #f03e3e);
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+.badge-pending {
+  background: linear-gradient(90deg, #ffc107, #ffb300);
+  color: #212529;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+/* ------------------------
+   Buttons
+-------------------------*/
+.btn-primary {
+  background: linear-gradient(90deg, #0d6efd, #1b4fd4);
+  border: none;
+  border-radius: 10px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+.btn-primary:hover {
+  background: linear-gradient(90deg, #0b5ed7, #163bbd);
+  transform: translateY(-2px);
+}
+
+.btn-success {
+  background: linear-gradient(90deg, #198754, #20c997);
+  border: none;
+  border-radius: 10px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+.btn-success:hover {
+  background: linear-gradient(90deg, #157347, #199f6e);
+  transform: translateY(-2px);
+}
+
+.btn-outline-secondary {
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+.btn-outline-secondary:hover {
+  background: #f1f3f5;
+}
+
+.action-btns .btn {
+  border-radius: 8px;
+  font-size: 0.85rem;
+  padding: 4px 10px;
+}
+
+/* ------------------------
+   Modal (Forms)
+-------------------------*/
+.modal-content {
+  border-radius: 14px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+}
+
+.modal-header {
+  border-bottom: 1px solid #dee2e6;
+}
+
+.modal-title {
+  font-weight: 600;
+}
+
+.modal-footer {
+  border-top: 1px solid #dee2e6;
+}
+
+.form-label {
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.form-control {
+  border-radius: 10px;
+  border: 1px solid #ced4da;
+  padding: 10px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-control:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.15rem rgba(13,110,253,0.25);
+}
+
+/* ------------------------
+   Responsive
+-------------------------*/
+@media (max-width: 768px) {
+  .sidebar {
+    display: none;
+  }
+}
