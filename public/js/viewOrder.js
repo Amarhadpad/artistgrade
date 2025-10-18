@@ -1,6 +1,6 @@
 async function viewOrder(id){
   try {
-    const res = await fetch(`http://localhost:3000/api/orders/${id}`);
+    const res = await fetch(`/api/orders/${id}`);
     if(!res.ok) throw new Error('Failed to fetch order');
     const order = await res.json();
 

@@ -2,7 +2,7 @@ const ordersBody = document.getElementById("ordersBody");
 
 async function loadOrders() {
   try {
-    const res = await fetch('http://localhost:5000/api/orders'); // your API
+    const res = await fetch('/api/orders'); // your API
     if(!res.ok) throw new Error('Failed to fetch orders');
 
     const orders = await res.json();
@@ -44,7 +44,7 @@ async function loadOrders() {
 
 async function viewOrder(id){
   try {
-    const res = await fetch(`http://localhost:5000/api/orders/${id}`);
+    const res = await fetch(`/api/orders/${id}`);
     if(!res.ok) throw new Error('Failed to fetch order');
     const order = await res.json();
 
@@ -60,7 +60,7 @@ async function viewOrder(id){
 async function deleteOrder(id){
   if(!confirm("Are you sure you want to delete this order?")) return;
   try {
-    const res = await fetch(`http://localhost:5000/api/orders/${id}`, { method: 'DELETE' });
+    const res = await fetch(`/api/orders/${id}`, { method: 'DELETE' });
     if(!res.ok) throw new Error('Failed to delete order');
     loadOrders();
   } catch(err) {
