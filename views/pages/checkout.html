@@ -154,11 +154,18 @@
         let total = 0;
         checkoutCart.innerHTML = '';
         cart.forEach(item => {
+          const quantity = item.quantity || 1;
+          const itemPrice = parseFloat(item.price.replace('₹',''));
+          const itemTotal = itemPrice * quantity;
+          
           const div = document.createElement("div");
           div.className = "cart-item";
-          div.innerHTML = `<span>${item.name}</span><span>${item.price}</span>`;
+          div.innerHTML = `
+            <span>${item.name} ${quantity > 1 ? `(Qty: ${quantity})` : ''}</span>
+            <span>₹${itemTotal.toFixed(2)}</span>
+          `;
           checkoutCart.appendChild(div);
-          total += parseFloat(item.price.replace('₹',''));
+          total += itemTotal;
         });
 
         const totalDiv = document.createElement("div");
@@ -196,7 +203,10 @@
           zip: document.getElementById("zip").value,
           transactionId: transactionId,
           cartItems: cart,
-          totalAmount: cart.reduce((sum, item) => sum + parseFloat(item.price.replace('₹','')), 0)
+          totalAmount: cart.reduce((sum, item) => {
+            const quantity = item.quantity || 1;
+            return sum + (parseFloat(item.price.replace('₹','')) * quantity);
+          }, 0)
         };
 
         try {

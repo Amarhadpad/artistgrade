@@ -93,7 +93,7 @@ async function fetchProducts() {
     products.forEach(p => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td><img src="${p.image}" class="product-img"></td>
+        <td><img src="${(typeof p.image === 'string') ? p.image : p.image?.url || ''}" class="product-img"></td>
         <td>${escapeHtml(p.name)}</td>
         <td>${escapeHtml(p.category)}</td>
         <td>₹${p.price}</td>
@@ -125,7 +125,7 @@ async function startEdit(id) {
     document.getElementById('productStock').value = p.stock;
 
     const preview = document.getElementById('imagePreview');
-    preview.src = p.image;
+    preview.src = (typeof p.image === 'string') ? p.image : p.image?.url || '';
     preview.style.display = 'block';
 
     new bootstrap.Modal(document.getElementById('addProductModal')).show();

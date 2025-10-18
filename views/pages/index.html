@@ -19,207 +19,107 @@
 
   <!-- Global Styles -->
   <link rel="stylesheet" href="/public/css/style.css">
-  <link rel="stylesheet" href="/public/js/s">
   <link rel="stylesheet" href="/public/css/nav.css">
+  <link rel="stylesheet" href="/public/css/cart.css">
+  
 <style>
-/* Full-page Lightbox */
-#imageLightbox {
+/* Preloader Full Page */
+#logoSplash {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.85);
-  display: none; /* hidden by default */
+  background: linear-gradient(135deg, #1f1c2c, #928dab);
+  display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 3000;
-  cursor: zoom-out;
-  overflow: auto; /* allows scrolling for very large images */
+  z-index: 9999;
+  overflow: hidden;
+  flex-direction: column;
 }
 
-#imageLightbox img {
-  max-width: 95%;       /* fit almost full width */
-  max-height: 95%;      /* fit almost full height */
-  object-fit: contain;  /* maintain aspect ratio */
-  border-radius: 10px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-  transition: transform 0.3s ease;
-}
-
-#imageLightbox.show img {
-  transform: scale(1.05); /* subtle zoom-in effect */
-}
-
-#closeLightbox {
+/* Animated Background */
+.background-animation {
   position: absolute;
-  top: 20px;
-  right: 30px;
-  font-size: 2rem;
-  color: #fff;
-  cursor: pointer;
-  font-weight: bold;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 1%, transparent 1%);
+  background-size: 50px 50px;
+  animation: rotateBackground 10s linear infinite;
+  z-index: 1;
 }
 
+@keyframes rotateBackground {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Logo Container */
+.logo-container {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Logo Image */
+.logo-splash {
+  width: 300px;       /* bigger logo */
+  max-width: 70vw;    /* responsive on small screens */
+  height: auto;
+  animation: logoAppear 1s ease forwards;
+  opacity: 0;
+}
+
+/* Animated Text */
+.splash-text {
+  margin-top: 15px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.2rem;   /* smaller text */
+  color: #fff;
+  letter-spacing: 1.5px;
+  opacity: 0;
+  animation: textFadeIn 2s 0.8s ease forwards; /* delayed after logo */
+  text-align: center;
+}
+
+
+@keyframes logoAppear {
+  0% { opacity: 0; transform: scale(0.6); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+
+/* Text Fade-in & Move Up */
+@keyframes textFadeIn {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.small a {
+  color: black;         /* text color black */
+  text-decoration: none; /* remove underline */
+}
+
+.small a:hover {
+  color: #de1f1fff;           /* optional: darker on hover */
+}
+
+
 </style>
 
-<style>
-  /* Product Cards */
-  .product-card {
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 12px;
-    padding: 15px;
-    transition: all 0.3s ease;
-  }
-  .product-card:hover {
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-    transform: translateY(-5px);
-  }
-  .product-card img {
-    border-radius: 12px;
-    height: 220px;
-    object-fit: cover;
-  }
-
-  /* Unique Carousel Buttons */
-  .carousel-control-prev.unique-prev,
-  .carousel-control-next.unique-next {
-    width: 50px;
-    height: 50px;
-    background: #222;
-    color: #fff;
-    border-radius: 50%;
-    top: 50%;
-    transform: translateY(-50%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0.8;
-    transition: all 0.3s ease;
-    border: none;
-    z-index: 10;
-  }
-
-  .carousel-control-prev.unique-prev:hover,
-  .carousel-control-next.unique-next:hover {
-    background: #444;
-    opacity: 1;
-  }
-
-  .carousel-control-prev.unique-prev i,
-  .carousel-control-next.unique-next i {
-    font-size: 1.5rem;
-  }
-
-  .carousel-control-prev.unique-prev { left: -25px; }
-  .carousel-control-next.unique-next { right: -25px; }
-
-  /* Mobile adjustments */
-  @media (max-width: 767px) {
-    .carousel-control-prev.unique-prev { left: 5px; }
-    .carousel-control-next.unique-next { right: 5px; }
-  }
-</style>
 
 <!-- Bootstrap Icons -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
-  <!-- Cart Sidebar Styles (namespaced so it doesn't affect your grids/layout) -->
-  <style>
-    /* Cart Sidebar */
-    .cart-sidebar {
-      position: fixed;
-      top: 0;
-      right: -360px;
-      width: 360px;
-      max-width: 95%;
-      height: 100%;
-      background: #fff;
-      box-shadow: -2px 0 12px rgba(0,0,0,0.2);
-      transition: right 0.28s ease;
-      z-index: 2000;
-      display: flex;
-      flex-direction: column;
-    }
-    .cart-sidebar.open {
-      right: 0;
-    }
-    .cart-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px;
-      border-bottom: 1px solid #e9e9e9;
-    }
-    .cart-body {
-      flex: 1;
-      overflow-y: auto;
-      padding: 14px;
-    }
-    .cart-item {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      align-items: center;
-      padding: 10px 0;
-      border-bottom: 1px solid #f1f1f1;
-    }
-    .cart-item span {
-      display: block;
-      max-width: 70%;
-      word-break: break-word;
-    }
-    .cart-footer {
-      padding: 14px;
-      border-top: 1px solid #e9e9e9;
-    }
-
-    /* Overlay */
-    .cart-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.45);
-      display: none;
-      z-index: 1900;
-    }
-    .cart-overlay.active {
-      display: block;
-    }
-
-    /* Cart count badge (hidden when zero) */
-    .cart-icon {
-      position: relative;
-      display: inline-block;
-    }
-    .cart-count {
-      display: none;
-      position: absolute;
-      top: -8px;
-      right: -10px;
-      background: #e63946;
-      color: #fff;
-      font-size: 12px;
-      font-weight: 700;
-      padding: 2px 6px;
-      border-radius: 999px;
-      line-height: 1;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-    }
-    .cart-count.show {
-      display: inline-block;
-    }
-
-    /* Small responsive tweak so sidebar doesn't overlap mobile header awkwardly */
-    @media (max-width: 480px){
-      .cart-sidebar { width: 92%; }
-    }
-  </style>
-
 <!-- Full-page Logo Preloader -->
 <div id="logoSplash">
   <div class="background-animation"></div> <!-- animated background -->
-  <img src="/public/images/car1.jpg" alt="ArtistGrade Logo" class="logo-splash">
+  <div class="logo-container">
+    <img src="/public/images/logo.png" alt="ArtistGrade Logo" class="logo-splash">
+    <h1 class="splash-text">"Craft Your Vision"</h1>
+  </div>
 </div>
 
 
@@ -237,7 +137,10 @@
         </div>
       </div>
       <div class="col-12 col-md-6 d-flex justify-content-center justify-content-md-end flex-wrap align-items-center gap-3">
-        <span class="small">Call us: <strong>+91 9921041736</strong></span>
+        <span class="small">
+  Call us: <a href="tel:+919137534732"><strong>+91 9137534732</strong></a>
+</span>
+
         <a href="#">Orders</a>
         <a href="#" class="cart-icon"><i class="fa fa-shopping-cart"></i></a>
       </div>
@@ -245,66 +148,66 @@
   </div>
 </div>
 <script>
-let isLoggedIn = false; // global login flag
+    let isLoggedIn = false; // global login flag
 
-// Function to check current user session
-async function checkUserLogin() {
-  try {
-    const res = await fetch('/api/current_user', {
-      method: 'GET',
-      credentials: 'include'
-    });
-    const user = await res.json();
+    // Function to check current user session
+    async function checkUserLogin() {
+      try {
+        const res = await fetch('/api/current_user', {
+          method: 'GET',
+          credentials: 'include'
+        });
+        const user = await res.json();
 
-    const topBar = document.getElementById("topBarUser");
+        const topBar = document.getElementById("topBarUser");
 
-    if (user && user.name) {
-      // ✅ User logged in
-      isLoggedIn = true;
-      topBar.innerHTML = `
-        Welcome, <strong>${user.name}</strong> |
-        <a href="/logout">Logout</a>
-      `;
-      console.log("✅ Logged in as:", user.name);
-    } else {
-      // ❌ Not logged in
-      isLoggedIn = false;
-      topBar.innerHTML = `
-        Welcome visitor, you can 
-        <a href="/login">Log in</a> or 
-        <a href="/register">Create an Account</a>
-      `;
-    }
-  } catch (err) {
-    console.error("Error checking user login:", err);
-  }
-}
-
-// Run check on every page load
-window.addEventListener("DOMContentLoaded", checkUserLogin);
-
-
-// 🛒 Proceed to Payment logic
-const checkoutBtn = document.getElementById("checkoutBtn");
-
-if (checkoutBtn) {
-  checkoutBtn.addEventListener("click", () => {
-    const cart = getCart(); // your existing cart function
-
-    if (!cart || cart.length === 0) {
-      alert("Your cart is empty!");
-      return;
+        if (user && user.name) {
+          // ✅ User logged in
+          isLoggedIn = true;
+          topBar.innerHTML = `
+            Welcome, <strong>${user.name}</strong> |
+            <a href="/logout">Logout</a>
+          `;
+          console.log("✅ Logged in as:", user.name);
+        } else {
+          // ❌ Not logged in
+          isLoggedIn = false;
+          topBar.innerHTML = `
+            Welcome visitor, you can 
+            <a href="/login">Log in</a> or 
+            <a href="/register">Create an Account</a>
+          `;
+        }
+      } catch (err) {
+        console.error("Error checking user login:", err);
+      }
     }
 
-    if (!isLoggedIn) {
-      alert("Please log in to proceed to payment.");
-      window.location.href = `/login?redirect=/checkout`;
-    } else {
-      console.log("Proceeding to payment...");
-      window.location.href = "/checkout";
+    // Run check on every page load
+    window.addEventListener("DOMContentLoaded", checkUserLogin);
+
+
+    // 🛒 Proceed to Payment logic
+    const checkoutBtn = document.getElementById("checkoutBtn");
+
+    if (checkoutBtn) {
+      checkoutBtn.addEventListener("click", () => {
+        const cart = getCart(); // your existing cart function
+
+        if (!cart || cart.length === 0) {
+          alert("Your cart is empty!");
+          return;
+        }
+
+        if (!isLoggedIn) {
+          alert("Please log in to proceed to payment.");
+          window.location.href = `/login?redirect=/checkout`;
+        } else {
+          console.log("Proceeding to payment...");
+          window.location.href = "/checkout";
+        }
+      });
     }
-  });
-}
 </script>
 
 
@@ -337,25 +240,67 @@ if (checkoutBtn) {
     <a href="/shop" class="btn-explore">Explore Collection</a>
   </div>
 </section>
-
- <!-- Best Sellers / Top Brands -->
+<!-- Best Sellers / Top Brands -->
 <section class="best-sellers py-5">
   <div class="container position-relative">
     <h2 class="section-title text-center mb-4">BEST SELLERS</h2>
 
-<div id="bestSellersCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-wrap="true">
-  <div class="carousel-inner" id="bestSellersInner">
-    <!-- Dynamic slides will be injected here -->
-  </div>
+    <div id="bestSellersCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-wrap="true">
+      <div class="carousel-inner" id="bestSellersInner">
+
+        <!-- Example Slide (replace with dynamic content) -->
+        <div class="carousel-item active">
+          <img src="https://via.placeholder.com/1200x500" class="d-block w-100 carousel-img" alt="Best Seller 1">
+        </div>
+
+        <div class="carousel-item">
+          <img src="https://via.placeholder.com/1200x500" class="d-block w-100 carousel-img" alt="Best Seller 2">
+        </div>
+
+      </div>
+
       <!-- Carousel Controls -->
       <button class="carousel-control-prev unique-prev" type="button" data-bs-target="#bestSellersCarousel" data-bs-slide="prev">
-        <i class="bi bi-chevron-left"></i>
+        <i class="bi bi-chevron-left fs-3 text-dark"></i>
       </button>
       <button class="carousel-control-next unique-next" type="button" data-bs-target="#bestSellersCarousel" data-bs-slide="next">
-        <i class="bi bi-chevron-right"></i>
+        <i class="bi bi-chevron-right fs-3 text-dark"></i>
       </button>
-</div>
+    </div>
+  </div>
 </section>
+<!-- Combined & Clean CSS -->
+<style>
+  /* Carousel images */
+  .carousel-item img, 
+  .carousel-img {
+    width: 100%;            
+    height: 200px;          /* compact height */
+    object-fit: contain;     /* ensures full image visible */
+    background-color: #f8f9fa; 
+    border-radius: 12px;     
+  }
+
+  /* Carousel controls */
+  .unique-prev, .unique-next {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .unique-prev:hover, .unique-next:hover {
+    background: rgba(255, 255, 255, 1);
+  }
+
+  .carousel-control-prev i,
+  .carousel-control-next i {
+    color: #333;
+    font-size: 1.2rem;
+  }
+</style>
   
 <!-- Features Section -->
 <section class="features-section py-5">
@@ -427,7 +372,7 @@ if (checkoutBtn) {
 
       <div class="footer-social">
         <a href="#"><i class="fab fa-facebook-f"></i></a>
-        <a href="#"><i class="fab fa-instagram"></i></a>
+        <a href="https://www.instagram.com/artistgrade_"><i class="fab fa-instagram"></i></a>
         <a href="#"><i class="fab fa-twitter"></i></a>
         <a href="#"><i class="fab fa-youtube"></i></a>
       </div>
@@ -549,26 +494,58 @@ if (checkoutBtn) {
       }
 
       cartItemsContainer.innerHTML = "";
+      let totalItems = 0;
+      
       cart.forEach((item, index) => {
+        const quantity = item.quantity || 1;
+        totalItems += quantity;
+        
         const div = document.createElement("div");
         div.className = "cart-item";
         div.innerHTML = `
-          <span>${item.name} - ${item.price}</span>
+          <span>${item.name} - ${item.price} ${quantity > 1 ? `(Qty: ${quantity})` : ''}</span>
           <div>
+            <button class="btn btn-sm btn-outline-secondary decrease-qty" data-index="${index}">-</button>
+            <span class="mx-2">${quantity}</span>
+            <button class="btn btn-sm btn-outline-primary increase-qty" data-index="${index}">+</button>
             <button class="btn btn-sm btn-outline-danger remove-item" data-index="${index}">Remove</button>
           </div>`;
         cartItemsContainer.appendChild(div);
       });
 
-      // Update badge
-      cartCountBadge.textContent = cart.length;
+      // Update badge with total item count
+      cartCountBadge.textContent = totalItems;
       cartCountBadge.classList.add("show");
 
-      // Attach remove listeners
+      // Attach event listeners
       cartItemsContainer.querySelectorAll(".remove-item").forEach(btn => {
         btn.addEventListener("click", () => {
           const cart = getCart();
           cart.splice(parseInt(btn.dataset.index), 1);
+          saveCart(cart);
+          updateCartUI();
+        });
+      });
+
+      cartItemsContainer.querySelectorAll(".increase-qty").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const cart = getCart();
+          const index = parseInt(btn.dataset.index);
+          cart[index].quantity = (cart[index].quantity || 1) + 1;
+          saveCart(cart);
+          updateCartUI();
+        });
+      });
+
+      cartItemsContainer.querySelectorAll(".decrease-qty").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const cart = getCart();
+          const index = parseInt(btn.dataset.index);
+          if (cart[index].quantity > 1) {
+            cart[index].quantity -= 1;
+          } else {
+            cart.splice(index, 1);
+          }
           saveCart(cart);
           updateCartUI();
         });
@@ -582,7 +559,14 @@ if (checkoutBtn) {
       const price = card.querySelector("p").textContent.trim();
       const cart = getCart();
 
-      cart.push({ name, price });
+      // Check if item already exists in cart
+      const existingItem = cart.find(item => item.name === name && item.price === price);
+      if (existingItem) {
+        existingItem.quantity = (existingItem.quantity || 1) + 1;
+      } else {
+        cart.push({ name, price, quantity: 1 });
+      }
+      
       saveCart(cart);
       updateCartUI();
 
@@ -659,7 +643,7 @@ if (checkoutBtn) {
           rowHTML += `
             <div class="col-12 col-md-6 col-lg-3 ${index > 0 ? "d-none d-md-block" : ""} ${index > 1 ? "d-none d-lg-block" : ""}">
               <div class="product-card text-center">
-                <img src="${p.image}" class="d-block w-100" alt="${p.name}">
+                <img src="${(typeof p.image === 'string') ? p.image : p.image?.url || ''}" class="d-block w-100" alt="${p.name}">
                 <h3>${p.name}</h3>
                 <p>₹${p.price}</p>
                 <button class="btn btn-dark" onclick="addToCart('${p._id}')">Add to Cart</button>
@@ -737,7 +721,7 @@ if (checkoutBtn) {
           rowHTML += `
             <div class="col-12 col-md-6 col-lg-3">
               <div class="product-card text-center">
-                <img src="${p.image}" class="d-block w-100 carousel-img" alt="${p.name}" style="cursor:pointer;">
+                <img src="${(typeof p.image === 'string') ? p.image : p.image?.url || ''}" class="d-block w-100 carousel-img" alt="${p.name}" style="cursor:pointer;">
                 <h3>${p.name}</h3>
                 <p>₹${p.price}</p>
                 <button class="btn btn-dark" onclick="addToCart('${p._id}')">Add to Cart</button>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Manage Images | Admin Panel</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="../../../public/css/adminstyles.css">
+</head>
+<body>
+
+<div class="container-fluid">
+  <div class="row">
+
+    <!-- Sidebar -->
+    <nav class="col-md-2 d-none d-md-block sidebar">
+      <div class="text-center text-white mb-4 fs-4">AdminPanel</div>
+      <a href="dashboard"><i class="fas fa-chart-line me-2"></i> Dashboard</a>
+      <a href="products"><i class="fas fa-box me-2"></i> Products</a>
+      <a href="orders"><i class="fas fa-shopping-cart me-2"></i> Orders</a>
+      <a href="users"><i class="fas fa-users me-2"></i> Users</a>
+      <a href="images" class="active"><i class="fas fa-image me-2"></i>Images</a>
+      <a href="/logout"><i class="fas fa-sign-out-alt me-2"></i> Logout</a>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="col-md-10 ms-sm-auto px-md-4">
+      <div class="dashboard-header mt-4 mb-4">
+        <h3 class="fw-semibold">Manage Site Images</h3>
+        <p class="text-muted">Upload or replace Background, Spinner, and GP Scanner images</p>
+      </div>
+
+      <div class="row g-4">
+        <!-- Background -->
+        <div class="col-md-4 text-center">
+          <h6>Background</h6>
+          <img id="previewBackground" src="/uploads/background.png" class="img-fluid mb-2" style="height:150px; object-fit:cover;">
+          <input type="file" id="backgroundFile" class="form-control mb-2" accept="image/*">
+        </div>
+
+        <!-- Spinner -->
+        <div class="col-md-4 text-center">
+          <h6>Spinner</h6>
+          <img id="previewSpinner" src="/uploads/spinner.png" class="img-fluid mb-2" style="height:150px; object-fit:cover;">
+          <input type="file" id="spinnerFile" class="form-control mb-2" accept="image/*">
+        </div>
+
+        <!-- GP Scanner -->
+        <div class="col-md-4 text-center">
+          <h6>GP Scanner</h6>
+          <img id="previewGP" src="/uploads/gp.png" class="img-fluid mb-2" style="height:150px; object-fit:cover;">
+          <input type="file" id="gpFile" class="form-control mb-2" accept="image/*">
+        </div>
+      </div>
+
+      <div id="uploadMsg" class="mt-3 text-success"></div>
+    </main>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const cloudName = "dbbzwinzl"; // Cloudinary cloud name
+const uploadPreset = "artistgrade"; // Your unsigned preset
+
+document.addEventListener('DOMContentLoaded', () => {
+    const types = ['background', 'spinner', 'gp'];
+
+    types.forEach(type => {
+        const input = document.getElementById(type + 'File');
+        const preview = document.getElementById('preview' + capitalize(type));
+
+        // Instant preview + auto upload on selection
+        input.addEventListener('change', async e => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Show preview immediately
+            const reader = new FileReader();
+            reader.onload = ev => {
+                preview.src = ev.target.result;
+            };
+            reader.readAsDataURL(file);
+
+            // Auto-upload
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('type', type);
+
+            try {
+                const res = await fetch('/api/admin/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Upload failed');
+
+                // Update preview permanently
+                preview.src = data.url;
+                document.getElementById('uploadMsg').textContent = `${capitalize(type)} uploaded successfully!`;
+
+                input.value = ''; // reset input
+            } catch (err) {
+                console.error(err);
+                alert('Upload failed: ' + err.message);
+            }
+        });
+    });
+
+    // Load existing images on page load
+    loadImages();
+});
+
+function capitalize(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+async function loadImages() {
+    try {
+        const res = await fetch('/api/admin/images');
+        const images = await res.json();
+
+        const background = images.find(img => img.public_id.toLowerCase().includes('background'));
+        const spinner = images.find(img => img.public_id.toLowerCase().includes('spinner'));
+        const gp = images.find(img => img.public_id.toLowerCase().includes('gp'));
+
+        if(background) document.getElementById('previewBackground').src = background.url;
+        if(spinner) document.getElementById('previewSpinner').src = spinner.url;
+        if(gp) document.getElementById('previewGP').src = gp.url;
+
+    } catch (err) {
+        console.error('Error loading images:', err);
+    }
+}
+</script>
+
+</body>
+</html>

@@ -14,6 +14,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="/public/css/nav.css">
+  <link rel="stylesheet" href="/public/css/cart.css">
+
 
   <style>
     body { font-family: 'Poppins', sans-serif; background:#f9f9f9; margin:0; margin-top:110px; }
@@ -29,6 +31,15 @@
     .site-footer { background:#2c3e50; color:#fff; padding:50px 20px 20px; }
     .social a { display:inline-block; margin-right:10px; font-size:1.2rem; transition:0.3s; }
     .social a:hover { color:#e74c3c; transform:translateY(-3px); }
+    .small a {
+  color: black;         /* text color black */
+  text-decoration: none; /* remove underline */
+}
+
+.small a:hover {
+  color: #333;           /* optional: darker on hover */
+}
+
   </style>
 </head>
 <body>
@@ -47,8 +58,10 @@
         </div>
       </div>
       <div class="col-12 col-md-6 d-flex justify-content-center justify-content-md-end flex-wrap align-items-center gap-3">
-        <span class="small">Call us: <strong>+91 9921041736</strong></span>
-        <a href="#">Orders</a>
+        <span class="small">
+  Call us: <a href="tel:+919137534732"><strong>+91 9137534732</strong></a>
+</span>
+<a href="#">Orders</a>
         <a href="#" class="cart-icon"><i class="fa fa-shopping-cart"></i></a>
       </div>
     </div>
@@ -118,6 +131,23 @@
     <a href="/contactus" class="btn btn-dark px-4">Get in Touch</a>
   </div>
 </section>
+<!-- ✅ CART SIDEBAR -->
+<div id="cartSidebar" class="cart-sidebar" aria-hidden="true">
+  <div class="cart-header">
+    <h5 class="mb-0">Your Cart</h5>
+    <button class="btn-close" id="closeCart" aria-label="Close cart"></button>
+  </div>
+  
+  <div class="cart-body" id="cartItems">
+    <p class="text-muted">Your cart is empty</p>
+  </div>
+  
+  <div class="cart-footer">
+    <button id="checkoutBtn" class="btn btn-dark w-100">Proceed to Checkout</button>
+  </div>
+</div>
+
+<div id="cartOverlay" class="cart-overlay" tabindex="-1"></div>
 
 <!-- Footer -->
 <footer class="artist-footer">
@@ -129,7 +159,7 @@
 
       <div class="footer-social">
         <a href="#"><i class="fab fa-facebook-f"></i></a>
-        <a href="#"><i class="fab fa-instagram"></i></a>
+        <a href="https://www.instagram.com/artistgrade_"><i class="fab fa-instagram"></i></a>
         <a href="#"><i class="fab fa-twitter"></i></a>
         <a href="#"><i class="fab fa-youtube"></i></a>
       </div>
@@ -147,7 +177,7 @@
         <li><a href="/shop">Shop</a></li>
         <li><a href="/about">About Us</a></li>
         <li><a href="/contactus">Contact Us</a></li>
-        <li><a href="/faq.html">FAQ</a></li>
+        <li><a href="/admin">Admin</a></li>
       </ul>
     </div>
 
@@ -190,6 +220,147 @@
 
     // Call it on page load
     updateTopBar();
+</script>
+
+<!-- ✅ CART SIDEBAR SCRIPT -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const cartIcon = document.querySelector(".cart-icon");
+  const sidebar = document.getElementById("cartSidebar");
+  const overlay = document.getElementById("cartOverlay");
+  const closeCart = document.getElementById("closeCart");
+  const checkoutBtn = document.getElementById("checkoutBtn");
+  const cartItemsContainer = document.getElementById("cartItems");
+
+  const cartCountBadge = document.createElement("span");
+  cartCountBadge.className = "cart-count";
+  cartIcon.appendChild(cartCountBadge);
+
+  function getCart() { return JSON.parse(localStorage.getItem("cart") || "[]"); }
+  function saveCart(cart) { localStorage.setItem("cart", JSON.stringify(cart)); }
+
+  function updateCartUI() {
+    const cart = getCart();
+    if (cart.length === 0) {
+      cartItemsContainer.innerHTML = '<p class="text-muted">Your cart is empty</p>';
+      cartCountBadge.textContent = "";
+      cartCountBadge.classList.remove("show");
+      return;
+    }
+
+    cartItemsContainer.innerHTML = "";
+    let totalItems = 0;
+    cart.forEach((item, index) => {
+      const quantity = item.quantity || 1;
+      totalItems += quantity;
+      const div = document.createElement("div");
+      div.className = "cart-item";
+      div.innerHTML = `
+        <span>${item.name} - ₹${item.price} ${quantity > 1 ? `(Qty: ${quantity})` : ''}</span>
+        <div>
+          <button class="btn btn-sm btn-outline-secondary decrease-qty" data-index="${index}">-</button>
+          <span class="mx-2">${quantity}</span>
+          <button class="btn btn-sm btn-outline-primary increase-qty" data-index="${index}">+</button>
+          <button class="btn btn-sm btn-outline-danger remove-item" data-index="${index}">Remove</button>
+        </div>`;
+      cartItemsContainer.appendChild(div);
+    });
+
+    cartCountBadge.textContent = totalItems;
+    cartCountBadge.classList.add("show");
+
+    // Event Listeners
+    cartItemsContainer.querySelectorAll(".remove-item").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const cart = getCart();
+        cart.splice(parseInt(btn.dataset.index), 1);
+        saveCart(cart);
+        updateCartUI();
+      });
+    });
+
+    cartItemsContainer.querySelectorAll(".increase-qty").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const cart = getCart();
+        const index = parseInt(btn.dataset.index);
+        cart[index].quantity = (cart[index].quantity || 1) + 1;
+        saveCart(cart);
+        updateCartUI();
+      });
+    });
+
+    cartItemsContainer.querySelectorAll(".decrease-qty").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const cart = getCart();
+        const index = parseInt(btn.dataset.index);
+        if (cart[index].quantity > 1) {
+          cart[index].quantity -= 1;
+        } else {
+          cart.splice(index, 1);
+        }
+        saveCart(cart);
+        updateCartUI();
+      });
+    });
+  }
+
+  window.addToCart = (productId) => {
+    const card = document.querySelector(`[onclick="addToCart('${productId}')"]`).closest(".product-card");
+    const name = card.querySelector("h3").textContent.trim();
+    const price = card.querySelector("p").textContent.trim().replace("₹", "");
+    const cart = getCart();
+
+    const existingItem = cart.find(item => item.name === name && item.price === price);
+    if (existingItem) {
+      existingItem.quantity = (existingItem.quantity || 1) + 1;
+    } else {
+      cart.push({ name, price, quantity: 1 });
+    }
+
+    saveCart(cart);
+    updateCartUI();
+    sidebar.classList.add("open");
+    overlay.classList.add("active");
+  };
+
+  cartIcon.addEventListener("click", (e) => {
+    e.preventDefault();
+    sidebar.classList.add("open");
+    overlay.classList.add("active");
+  });
+  closeCart.addEventListener("click", () => {
+    sidebar.classList.remove("open");
+    overlay.classList.remove("active");
+  });
+  overlay.addEventListener("click", () => {
+    sidebar.classList.remove("open");
+    overlay.classList.remove("active");
+  });
+
+  checkoutBtn.addEventListener("click", async () => {
+    const cart = getCart();
+    if (cart.length === 0) {
+      alert("Your cart is empty. Please add items before proceeding.");
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/current_user');
+      const user = await res.json();
+
+      if (!user || !user.name) {
+        alert("Please log in to continue checkout.");
+        window.location.href = `/login?redirect=/checkout`;
+      } else {
+        window.location.href = "/checkout";
+      }
+    } catch (err) {
+      console.error('Login check failed:', err);
+    }
+  });
+
+  updateCartUI();
+});
 </script>
 
 </body>

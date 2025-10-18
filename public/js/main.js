@@ -21,7 +21,7 @@ async function loadBestSellers() {
         rowHTML += `
           <div class="col-12 col-md-6 col-lg-3 ${idx > 0 ? 'd-none d-md-block' : ''} ${idx > 1 ? 'd-none d-lg-block' : ''}">
             <div class="product-card text-center" data-id="${p._id}">
-              <img src="${p.image}" class="d-block w-100" alt="${p.name}">
+              <img src="${(typeof p.image === 'string') ? p.image : p.image?.url || ''}" class="d-block w-100" alt="${p.name}">
               <h3>${p.name}</h3>
               <p>₹${p.price.toFixed(2)}</p>
               <button class="btn btn-dark add-to-cart-btn">Add to Cart</button>

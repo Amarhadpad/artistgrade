@@ -1,4 +1,5 @@
 
+
   const API = '/api/products';
 
   // Fetch total products count from DB
@@ -18,6 +19,25 @@
   document.addEventListener('DOMContentLoaded', fetchTotalProducts);
 
 const USERS_API = '/api/users';
+
+const ORDERS_API = '/api/orders'; // Make sure this is your backend endpoint for orders
+
+// Fetch total orders count from DB
+async function fetchTotalOrders() {
+  try {
+    const res = await fetch(ORDERS_API);
+    if (!res.ok) throw new Error('Failed to fetch orders');
+    const orders = await res.json();
+    document.getElementById('totalOrders').textContent = orders.length || 0;
+  } catch (err) {
+    console.error('Error fetching total orders:', err);
+    document.getElementById('totalOrders').textContent = '0';
+  }
+}
+
+// Call on page load
+document.addEventListener('DOMContentLoaded', fetchTotalOrders);
+
 
 // Fetch total users count from DB
 async function fetchTotalUsers() {

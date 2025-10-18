@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const div = document.createElement("div");
       div.className = "product";
       div.innerHTML = `
-        <img src="${p.image}" alt="${p.title}">
+        <img src="${(typeof p.image === 'string') ? p.image : p.image?.url || ''}" alt="${p.title}">
         <h3>${p.title}</h3>
         <p>Category: ${p.category}</p>
         <p>Style: ${p.style}</p>

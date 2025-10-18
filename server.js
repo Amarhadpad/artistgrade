@@ -7,28 +7,45 @@ const path = require('path');
 const fs = require('fs');
 const session = require('express-session');
 const passport = require('passport');
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const nodemailer = require('nodemailer');
 const router = express.Router();
+const streamifier = require('streamifier');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5;
 const cloudinary = require('cloudinary').v2;
 
-cloudinary.config({
-  cloud_name: process.env.CLOUD_NAME, // Your cloud name
-  api_key: process.env.CLOUD_API_KEY, // Your API key
-  api_secret: process.env.CLOUD_API_SECRET, // Your API secret
-});
+// Static admin credentials
+const ADMIN_CREDENTIALS = {
+  username: 'Admin',
+  password: 'Admin@0000'
+};
 
-module.exports = cloudinary;
-
+// ---------------------
+// Safe Cloudinary config
+// ---------------------
+try {
+  if (process.env.CLOUDINARY_URL) {
+    cloudinary.config({ secure: true });
+  } else {
+    cloudinary.config({
+      cloud_name: process.env.CLOUD_NAME || '',
+      api_key: process.env.CLOUD_API_KEY || '',
+      api_secret: process.env.CLOUD_API_SECRET || '',
+      secure: true
+    });
+  }
+  console.log('✅ Cloudinary configured');
+} catch (err) {
+  console.error('⚠️ Cloudinary config error:', err.message);
+}
 
 // ---------------------
 // Ensure uploads dir exists
 // ---------------------
 const UPLOAD_DIR = path.join(__dirname, 'uploads');
 if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR);
+
 
 // ---------------------
 // Middleware
@@ -37,7 +54,6 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/public', express.static(path.join(__dirname, 'public')));
-app.use('/uploads', express.static(UPLOAD_DIR));
 
 // ---------------------
 // MongoDB connection
@@ -67,14 +83,7 @@ const Product = mongoose.model('Product', ProductSchema);
 const Order = mongoose.model('Order', new mongoose.Schema({}, { strict: false }));
 const User = mongoose.model('User', new mongoose.Schema({}, { strict: false }));
 
-// ---------------------
-// Multer config
-// ---------------------
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, UPLOAD_DIR),
-  filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname))
-});
-const upload = multer({ storage });
+
 
 // ---------------------
 // FRONTEND ROUTES
@@ -85,15 +94,38 @@ pages.forEach(page => {
     res.sendFile(path.join(__dirname, `views/pages/${page}.html`));
   });
 });
+// Basic Auth middleware
+function basicAuth(req, res, next) {
+  const auth = req.headers['authorization'];
 
-// Admin pages
-const adminPages = ['dashboard', 'products', 'orders', 'users'];
+  if (!auth) {
+    res.setHeader('WWW-Authenticate', 'Basic realm="Admin Area"');
+    return res.status(401).send('Authentication required.');
+  }
+
+  // Decode base64
+  const base64Credentials = auth.split(' ')[1];
+  const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii');
+  const [username, password] = credentials.split(':');
+
+  // Check credentials
+  if (username === 'Admin' && password === 'Admin@0000') {
+    next(); // Access granted
+  } else {
+    res.setHeader('WWW-Authenticate', 'Basic realm="Admin Area"');
+    return res.status(401).send('Invalid credentials.');
+  }
+}
+
+// Admin pages with basic auth
+const adminPages = ['dashboard', 'products', 'orders', 'users','images'];
 adminPages.forEach(page => {
-  app.get(`/${page}`, (req, res) => {
+  app.get(`/${page}`, basicAuth, (req, res) => {
     res.sendFile(path.join(__dirname, `views/pages/Admin/${page}.html`));
   });
 });
-app.get('/admin', (req, res) => res.redirect('/dashboard'));
+
+app.get('/admin', basicAuth, (req, res) => res.redirect('/dashboard'));
 
 // ---------------------
 // DASHBOARD COUNTS
@@ -113,7 +145,7 @@ app.get('/api/dashboard-counts', async (req, res) => {
 });
 
 // ---------------------
-// CRUD API for Products
+// CRUD API for Products (Cloudinary version)
 // ---------------------
 
 // Get all products
@@ -139,31 +171,34 @@ app.get('/api/products/:id', async (req, res) => {
   }
 });
 
-// Create new product
-app.post('/api/products', upload.single('image'), async (req, res) => {
+// Create new product (Cloudinary image URL from frontend)
+app.post('/api/products', async (req, res) => {
   try {
-    const { name, category, price, stock } = req.body;
+    const { name, category, price, stock, image } = req.body;
 
     // Validate required fields
     if (!name || !price || !stock) {
       return res.status(400).json({ message: 'Name, price, and stock are required' });
     }
 
-    // Store image path
-    const image = req.file ? `/uploads/${req.file.filename}` : '';
+    // Handle image format - could be string or object
+    let imageUrl = '';
+    if (typeof image === 'string') {
+      imageUrl = image;
+    } else if (image && image.url) {
+      imageUrl = image.url;
+    }
 
-    // Create product
+    // Create product document
     const product = new Product({
       name,
       category,
       price: Number(price),
       stock: Number(stock),
-      image
+      image: imageUrl // ✅ Store as simple string URL
     });
 
-    // Save to MongoDB
     await product.save();
-
     res.json(product);
 
   } catch (err) {
@@ -172,47 +207,13 @@ app.post('/api/products', upload.single('image'), async (req, res) => {
   }
 });
 
-// Delete product
-app.delete('/api/products/:id', async (req, res) => {
+// Update product
+app.put('/api/products/:id', async (req, res) => {
   try {
+    const { name, category, price, stock, image } = req.body;
+
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).json({ message: 'Product not found' });
-
-    // Delete image from server
-    if (product.image) {
-      const imgPath = path.join(__dirname, product.image);
-      if (fs.existsSync(imgPath)) fs.unlinkSync(imgPath);
-    }
-
-    await Product.deleteOne({ _id: req.params.id });
-    res.json({ message: 'Product deleted successfully' });
-
-  } catch (err) {
-    console.error('Error deleting product:', err);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
-// Update product
-app.put('/api/products/:id', upload.single('image'), async (req, res) => {
-  try {
-    const { name, category, price, stock } = req.body;
-
-    // Find product by ID
-    const product = await Product.findById(req.params.id);
-    if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
-    }
-
-    // Handle new image upload
-    if (req.file) {
-      // Delete old image if exists
-      if (product.image) {
-        const oldPath = path.join(__dirname, product.image);
-        if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
-      }
-      product.image = `/uploads/${req.file.filename}`;
-    }
 
     // Update fields
     product.name = name || product.name;
@@ -220,7 +221,15 @@ app.put('/api/products/:id', upload.single('image'), async (req, res) => {
     product.price = price ? Number(price) : product.price;
     product.stock = stock ? Number(stock) : product.stock;
 
-    // Save updated product
+    // ✅ Handle image format - could be string or object
+    if (image) {
+      if (typeof image === 'string') {
+        product.image = image;
+      } else if (image.url) {
+        product.image = image.url;
+      }
+    }
+
     const updated = await product.save();
     res.json({ message: 'Product updated successfully', product: updated });
 
@@ -230,6 +239,21 @@ app.put('/api/products/:id', upload.single('image'), async (req, res) => {
   }
 });
 
+// Delete product
+app.delete('/api/products/:id', async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ message: 'Product not found' });
+
+    // ⚠️ Optional: Delete image from Cloudinary using API if needed (advanced)
+    await Product.deleteOne({ _id: req.params.id });
+
+    res.json({ message: 'Product deleted successfully' });
+  } catch (err) {
+    console.error('Error deleting product:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 
 // ---------------------
 // Sessions + Passport
@@ -241,15 +265,6 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
-
-// Google User Schema
-const GUserSchema = new mongoose.Schema({
-  googleId: String,
-  name: String,
-  email: String,
-  picture: String
-});
-const GUser = mongoose.model("UserAuth", GUserSchema);
 
 // Logout
 app.get("/logout", (req, res, next) => {
@@ -273,6 +288,12 @@ app.post('/login', async (req, res) => {
     if (!email || !password) {
       return res.status(400).send("Email and password are required");
     }
+    if (email === 'admin@admin.com' && password === 'admin123') {
+      req.session.userId = 'admin';   // special admin ID
+      req.session.fullname = 'Admin';
+      req.session.isAdmin = true;     // admin flag
+      return res.redirect('/dashboard'); // admin dashboard
+    }   
 
     // Find user
     const user = await UserReg.findOne({ email });
@@ -568,6 +589,101 @@ app.post('/api/orders', async (req, res) => {
         console.error(err);
         res.status(500).json({ message: 'Failed to save order' });
     }
+});
+
+// Update order status and send email
+app.put('/api/orders/:id/status', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    // Update the order
+    const order = await Order.findByIdAndUpdate(id, { status }, { new: true });
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+
+    // Configure NodeMailer
+    const transporter = nodemailer.createTransport({
+      service: 'Gmail', // or any SMTP service
+      auth: {
+        user: process.env.EMAIL_USER, // your email
+        pass: process.env.EMAIL_PASS  // your app password
+      }
+    });
+
+    // Email content
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: order.email,
+      subject: `Your Order ${order.orderId} Status Updated`,
+      text: `Hello ${order.fullName},\n\nYour order status has been updated to: ${status}.\n\nThank you for shopping with us!\n\n- ArtistGrade`
+    };
+
+    // Send email
+    transporter.sendMail(mailOptions, (err, info) => {
+      if (err) console.error('Email error:', err);
+      else console.log('Email sent:', info.response);
+    });
+
+    res.json({ status: order.status });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// images management page
+
+// Multer setup (memory storage)
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
+// Upload image endpoint
+app.post('/api/admin/upload', upload.single('file'), async (req, res) => {
+  try {
+    const { type } = req.body; // background, spinner, gp
+    if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+
+    // Function to upload buffer to Cloudinary via stream
+    const streamUpload = (buffer) => {
+      return new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: 'artistgrade-site' },
+          (error, result) => {
+            if (result) resolve(result);
+            else reject(error);
+          }
+        );
+        streamifier.createReadStream(buffer).pipe(stream);
+      });
+    };
+
+    const result = await streamUpload(req.file.buffer);
+    res.json({ url: result.secure_url, public_id: result.public_id });
+
+  } catch (err) {
+    console.error('Upload error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Get all uploaded images
+app.get('/api/admin/images', async (req, res) => {
+  try {
+    const resources = await cloudinary.api.resources({
+      type: 'upload',
+      prefix: 'artistgrade-site/'
+    });
+
+    const images = resources.resources.map(r => ({
+      url: r.secure_url,
+      public_id: r.public_id
+    }));
+
+    res.json(images);
+  } catch (err) {
+    console.error('Fetch images error:', err);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 
