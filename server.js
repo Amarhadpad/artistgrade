@@ -13,6 +13,7 @@ const streamifier = require('streamifier');
 
 const app = express();
 const PORT = process.env.PORT || 5;
+module.exports = app
 const cloudinary = require('cloudinary').v2;
 
 // Static admin credentials
@@ -690,4 +691,4 @@ app.get('/api/admin/images', async (req, res) => {
 // ---------------------
 // Start Server
 // ---------------------
-app.listen(PORT, () => console.log(`🚀 Server running at http://localhost:${PORT}`));
+//app.listen(PORT, () => console.log(`🚀 Server running at http://localhost:${PORT}`));
