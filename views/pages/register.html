@@ -117,17 +117,29 @@
 <script>
 document.getElementById('registerForm').addEventListener('submit', async (e) => {
   e.preventDefault();
+
   const formData = new FormData(e.target);
   const data = Object.fromEntries(formData.entries());
 
-  const res = await fetch('/api/register', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  });
+  try {
+    const res = await fetch('/api/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
 
-  const result = await res.json();
-  alert(result.message);
+    const result = await res.json();
+    alert(result.message);
+
+    // ✅ Redirect after successful registration
+    if (res.ok) {
+      window.location.href = '/login'; // change '/login' to your target page
+    }
+
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Something went wrong. Please try again!');
+  }
 });
 </script>
 
