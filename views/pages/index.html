@@ -23,88 +23,88 @@
   <link rel="stylesheet" href="/public/css/cart.css">
   
 <style>
-/* Preloader Full Page */
-#logoSplash {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, #1f1c2c, #928dab);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-  overflow: hidden;
-  flex-direction: column;
-}
+    /* Preloader Full Page */
+    #logoSplash {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #1f1c2c, #928dab);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      overflow: hidden;
+      flex-direction: column;
+    }
 
-/* Animated Background */
-.background-animation {
-  position: absolute;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(255,255,255,0.1) 1%, transparent 1%);
-  background-size: 50px 50px;
-  animation: rotateBackground 10s linear infinite;
-  z-index: 1;
-}
+    /* Animated Background */
+    .background-animation {
+      position: absolute;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 1%, transparent 1%);
+      background-size: 50px 50px;
+      animation: rotateBackground 10s linear infinite;
+      z-index: 1;
+    }
 
-@keyframes rotateBackground {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
+    @keyframes rotateBackground {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
 
-/* Logo Container */
-.logo-container {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+    /* Logo Container */
+    .logo-container {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
 
-/* Logo Image */
-.logo-splash {
-  width: 300px;       /* bigger logo */
-  max-width: 70vw;    /* responsive on small screens */
-  height: auto;
-  animation: logoAppear 1s ease forwards;
-  opacity: 0;
-}
+    /* Logo Image */
+    .logo-splash {
+      width: 300px;       /* bigger logo */
+      max-width: 70vw;    /* responsive on small screens */
+      height: auto;
+      animation: logoAppear 1s ease forwards;
+      opacity: 0;
+    }
 
-/* Animated Text */
-.splash-text {
-  margin-top: 15px;
-  font-family: 'Poppins', sans-serif;
-  font-size: 1.2rem;   /* smaller text */
-  color: #fff;
-  letter-spacing: 1.5px;
-  opacity: 0;
-  animation: textFadeIn 2s 0.8s ease forwards; /* delayed after logo */
-  text-align: center;
-}
-
-
-@keyframes logoAppear {
-  0% { opacity: 0; transform: scale(0.6); }
-  100% { opacity: 1; transform: scale(1); }
-}
+    /* Animated Text */
+    .splash-text {
+      margin-top: 15px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.2rem;   /* smaller text */
+      color: #fff;
+      letter-spacing: 1.5px;
+      opacity: 0;
+      animation: textFadeIn 2s 0.8s ease forwards; /* delayed after logo */
+      text-align: center;
+    }
 
 
-/* Text Fade-in & Move Up */
-@keyframes textFadeIn {
-  0% { opacity: 0; transform: translateY(20px); }
-  100% { opacity: 1; transform: translateY(0); }
-}
-.small a {
-  color: black;         /* text color black */
-  text-decoration: none; /* remove underline */
-}
+    @keyframes logoAppear {
+      0% { opacity: 0; transform: scale(0.6); }
+      100% { opacity: 1; transform: scale(1); }
+    }
 
-.small a:hover {
-  color: #de1f1fff;           /* optional: darker on hover */
-}
+
+    /* Text Fade-in & Move Up */
+    @keyframes textFadeIn {
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .small a {
+      color: black;         /* text color black */
+      text-decoration: none; /* remove underline */
+    }
+
+    .small a:hover {
+      color: #de1f1fff;           /* optional: darker on hover */
+    }
 
 
 </style>
@@ -465,9 +465,7 @@
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Cart behavior script (keeps footer & other content untouched) -->
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
     async function updateTopBar() {
       try {

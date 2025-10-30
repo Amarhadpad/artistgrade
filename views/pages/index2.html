@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ArtistGrade</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Font Awesome & Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/public/css/style.css">
+  <link rel="stylesheet" href="/public/css/nav.css">
+  <link rel="stylesheet" href="/public/css/cart.css">
+
+  <style>
+    /* --- Preloader --- */
+    #logoSplash {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, #1f1c2c, #928dab);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      overflow: hidden;
+    }
+
+    .background-animation {
+      position: absolute;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 1%, transparent 1%);
+      background-size: 50px 50px;
+      animation: rotateBackground 10s linear infinite;
+      z-index: 1;
+    }
+
+    @keyframes rotateBackground {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .logo-container {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+    }
+
+    .logo-splash {
+      width: 300px;
+      max-width: 70vw;
+      height: auto;
+      opacity: 0;
+      animation: logoAppear 1s ease forwards;
+    }
+
+    @keyframes logoAppear {
+      0% { opacity: 0; transform: scale(0.6); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    .splash-text {
+      margin-top: 15px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.2rem;
+      color: #fff;
+      letter-spacing: 1.5px;
+      opacity: 0;
+      animation: textFadeIn 2s 0.8s ease forwards;
+    }
+
+    @keyframes textFadeIn {
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Smooth fade-out */
+    body.loaded #logoSplash {
+      opacity: 0;
+      transition: opacity 0.5s ease-out;
+      pointer-events: none;
+    }
+
+    .small a {
+      color: black;
+      text-decoration: none;
+    }
+
+    .small a:hover {
+      color: #de1f1f;
+    }
+
+    /* Carousel image tweaks */
+    .carousel-img {
+      width: 100%;
+      height: 200px;
+      object-fit: contain;
+      background-color: #f8f9fa;
+      border-radius: 12px;
+    }
+  </style>
+</head>
+
+<body class="index-page">
+
+  <!-- Preloader -->
+  <div id="logoSplash">
+    <div class="background-animation"></div>
+    <div class="logo-container">
+      <img src="/public/images/logo.png" alt="ArtistGrade Logo" class="logo-splash">
+      <h1 class="splash-text">"Craft Your Vision"</h1>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <div class="fixed-header">
+    <!-- Top Bar -->
+    <div class="top-bar bg-light py-2 border-bottom">
+      <div class="container">
+        <div class="row align-items-center text-center text-md-start">
+          <div class="col-md-6">
+            <div class="left-text small" id="topBarUser">
+              Welcome visitor, you can 
+              <a href="/login">Log in</a> or 
+              <a href="/register">Create an Account</a>
+            </div>
+          </div>
+          <div class="col-md-6 d-flex justify-content-md-end gap-3">
+            <span class="small">Call us: <a href="tel:+919137534732"><strong>+91 9137534732</strong></a></span>
+            <a href="#" id="ordersLink">Orders</a>
+            <a href="#" class="cart-icon"><i class="fa fa-shopping-cart"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg main-nav">
+      <div class="container">
+        <a class="navbar-brand" href="/">ArtistGrade</a>
+        <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+          <i class="fa fa-bars text-white"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item"><a class="nav-link active" href="/">Home</a></li>
+            <li class="nav-item"><a class="nav-link" href="/shop">Shop</a></li>
+            <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
+            <li class="nav-item"><a class="nav-link" href="/contactus">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </div>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content text-center">
+      <h1>Elevate Your Artistry</h1>
+      <p>Experience the future of premium, hand-crafted art essentials designed exclusively for creators like you.</p>
+      <a href="/shop" class="btn-explore btn btn-dark">Explore Collection</a>
+    </div>
+  </section>
+
+  <!-- Best Sellers -->
+  <section class="best-sellers py-5">
+    <div class="container">
+      <h2 class="section-title text-center mb-4">BEST SELLERS</h2>
+      <div id="bestSellersCarousel" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner" id="bestSellersInner">
+          <div class="carousel-item active">
+            <img src="https://via.placeholder.com/1200x500" class="carousel-img" alt="Best Seller 1">
+          </div>
+        </div>
+        <button class="carousel-control-prev unique-prev" type="button" data-bs-target="#bestSellersCarousel" data-bs-slide="prev">
+          <i class="bi bi-chevron-left fs-3 text-dark"></i>
+        </button>
+        <button class="carousel-control-next unique-next" type="button" data-bs-target="#bestSellersCarousel" data-bs-slide="next">
+          <i class="bi bi-chevron-right fs-3 text-dark"></i>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="artist-footer">
+    <div class="footer-container">
+      <div class="footer-section footer-brand">
+        <h2 class="footer-logo">🎨 ArtistGrade</h2>
+        <p>Your one-stop store for premium art supplies & creative tools.</p>
+        <div class="footer-social">
+          <a href="#"><i class="fab fa-facebook-f"></i></a>
+          <a href="https://www.instagram.com/artistgrade_"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+        </div>
+        <a href="https://wa.me/919137534732" target="_blank" class="whatsapp-btn">
+          <i class="fab fa-whatsapp"></i> Chat on WhatsApp
+        </a>
+      </div>
+
+      <div class="footer-section">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/shop">Shop</a></li>
+          <li><a href="/about">About Us</a></li>
+          <li><a href="/contactus">Contact Us</a></li>
+          <li><a href="/admin">Admin</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>© 2025 ArtistGrade Inc. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Preloader fade-out
+    window.addEventListener("load", () => {
+      document.body.classList.add("loaded");
+      setTimeout(() => document.getElementById("logoSplash").remove(), 800);
+    });
+
+    // Orders link alert
+    document.getElementById("ordersLink").addEventListener("click", (e) => {
+      e.preventDefault();
+      alert("📩 Please check your registered email for your order details.");
+    });
+
+    // Load best sellers dynamically
+    async function loadBestSellers() {
+      try {
+        const res = await fetch("/api/products?bestSellers=true");
+        const products = await res.json();
+        const inner = document.getElementById("bestSellersInner");
+        inner.innerHTML = "";
+
+        for (let i = 0; i < products.length; i += 4) {
+          const slide = document.createElement("div");
+          slide.className = `carousel-item ${i === 0 ? "active" : ""}`;
+          let row = '<div class="row g-3 justify-content-center">';
+          products.slice(i, i + 4).forEach(p => {
+            row += `
+              <div class="col-md-3 text-center">
+                <div class="product-card">
+                  <img src="${p.image?.url || p.image}" alt="${p.name}" class="carousel-img">
+                  <h3>${p.name}</h3>
+                  <p>₹${p.price}</p>
+                  <button class="btn btn-dark" onclick="addToCart('${p._id}')">Add to Cart</button>
+                </div>
+              </div>`;
+          });
+          row += "</div>";
+          slide.innerHTML = row;
+          inner.appendChild(slide);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", loadBestSellers);
+  </script>
+</body>
+</html>
