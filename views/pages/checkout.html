@@ -191,7 +191,6 @@
           alert("Your cart is empty.");
           return;
         }
-
         // Collect billing info
         const orderData = {
           fullName: document.getElementById("fullName").value,
@@ -201,6 +200,7 @@
           city: document.getElementById("city").value,
           state: document.getElementById("state").value,
           zip: document.getElementById("zip").value,
+          date: new Date().toISOString(),
           transactionId: transactionId,
           cartItems: cart,
           totalAmount: cart.reduce((sum, item) => {

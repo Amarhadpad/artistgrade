@@ -117,7 +117,26 @@ function basicAuth(req, res, next) {
     return res.status(401).send('Invalid credentials.');
   }
 }
+// Add this route handler
+const authenticateUser = (req, res, next) => {
+  if (!req.session || !req.session.user) {
+    return res.status(401).json({ error: 'Please login to access this resource' });
+  }
+  req.user = req.session.user;
+  next();
+};
 
+module.exports = { authenticateUser };
+app.get('/my-orders', authenticateUser, async (req, res) => {
+  try {
+    const orders = await Order.find({ userId: req.user._id })
+      .sort({ createdAt: -1 });
+    res.json(orders);
+  } catch (err) {
+    console.error('Error fetching orders:', err);
+    res.status(500).json({ error: 'Failed to fetch orders' });
+  }
+});
 // Admin pages with basic auth
 const adminPages = ['dashboard', 'products', 'orders', 'users','images'];
 adminPages.forEach(page => {

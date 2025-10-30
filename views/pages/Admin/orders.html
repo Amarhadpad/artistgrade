@@ -98,7 +98,8 @@ async function loadOrders() {
           <small>${order.email}</small> <br>
           <small>${order.phone}</small>
         </td>
-        <td>${order.date ? new Date(order.date).toLocaleString() : '-'}</td>
+        <td>${new Date(order.date).toLocaleDateString('en-GB')}</td>
+
         <td>₹${order.totalAmount.toFixed(2)}</td>
         <td>
   <select class="form-select form-select-sm" onchange="updateStatus('${order._id}', this.value)">
